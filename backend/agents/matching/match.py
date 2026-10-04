@@ -20,9 +20,10 @@ from models.domain import (
 from rules.config import load_vertical
 from rules.eligibility import hard_check
 from rules.scheduling import Interval, covers, merge, subtract, total_hours
-from rules.scoring import Piece, distance_km, score_plan
+from rules.scoring import Piece, score_plan
 from services import audit, clock
 from services.repository import Store
+from services.travel import get_service as travel_service
 
 
 class NightCoverage(BaseModel):
@@ -40,6 +41,8 @@ class Candidate(BaseModel):
     years_experience: int
     area: str
     distance_km: float
+    travel_minutes: float | None = None
+    travel_source: str = "straight_line"
     previous_visits: int
     nights_full: int
     nights_total: int
@@ -82,7 +85,7 @@ def find_candidates(store: Store, request: CareRequest) -> MatchResult:
     work_until = nights[-1][1].date()
     today = clock.today()
 
-    candidates, excluded = [], []
+    candidates, excluded, eligible = [], [], []
     caregivers = store.all(Caregiver)
     for cg in caregivers:
         failed = hard_check(cg, vertical=r.care_type, required_credentials=r.required_credentials,
@@ -106,20 +109,25 @@ def find_candidates(store: Store, request: CareRequest) -> MatchResult:
             reason = why_unavailable(cg, nights[0], shifts, clients, config, own_shift_ids)
             excluded.append(Exclusion(caregiver_id=cg.id, name=cg.name, rule_id=reason.rule_id, reason=reason.detail))
             continue
+        eligible.append((cg, pieces, coverage, nights_full, partial_nights))
 
+    # One route-matrix call for everyone still in the running.
+    travel = travel_service().estimates({cg.id: cg.location for cg, *_ in eligible}, client.location)
+    for cg, pieces, coverage, nights_full, partial_nights in eligible:
         factors = score_plan(pieces, nights, client, config, r.required_skills, work_until,
-                             extra_handoffs=partial_nights)
+                             extra_handoffs=partial_nights, travel=travel)
         covered = total_hours([(p.start, p.end) for p in pieces])
+        est = travel[cg.id]
         candidates.append(Candidate(
             caregiver_id=cg.id, name=cg.name, credential_type=cg.credential_type,
-            years_experience=cg.years_experience, area=cg.location.area,
-            distance_km=round(distance_km(cg.location, client.location), 1),
+            years_experience=cg.years_experience, area=cg.location.area, distance_km=est.km,
+            travel_minutes=est.minutes, travel_source=est.source,
             previous_visits=client.visit_history.get(cg.id, 0), nights_full=nights_full,
             nights_total=len(nights), hours_covered=round(covered, 1),
             hours_demanded=round(total_hours(nights), 1), full_coverage=nights_full == len(nights),
             nights=coverage, factors=factors, total=sum(f.points for f in factors)))
 
-    candidates.sort(key=lambda c: (not c.full_coverage, -c.total, c.distance_km))
+    candidates.sort(key=lambda c: (not c.full_coverage, -c.total, c.travel_minutes or c.distance_km))
     return MatchResult(request_id=request.id, checked=len(caregivers), candidates=candidates, excluded=excluded)
 
 

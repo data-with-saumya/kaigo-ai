@@ -7,6 +7,11 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == workspaceId;
       allow write: if false;
     }
+    // v2 keeps its data separate from v1.
+    match /workspaces_v2/{workspaceId}/{document=**} {
+      allow read: if request.auth != null && request.auth.uid == workspaceId;
+      allow write: if false;
+    }
     match /{document=**} {
       allow read, write: if false;
     }

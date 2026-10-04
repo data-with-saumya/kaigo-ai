@@ -93,13 +93,14 @@ class MemoryRepository:
 
 
 class FirestoreRepository:
-    def __init__(self, project: str | None = None, database: str = "(default)") -> None:
+    def __init__(self, project: str | None = None, database: str = "(default)", root: str = "workspaces") -> None:
         from google.cloud import firestore
 
         self._db = firestore.Client(project=project, database=database)
+        self._root = root
 
     def _col(self, ws: str, collection: str):
-        return self._db.collection("workspaces").document(ws).collection(collection)
+        return self._db.collection(self._root).document(ws).collection(collection)
 
     def get(self, ws, collection, doc_id):
         snap = self._col(ws, collection).document(doc_id).get()
@@ -122,7 +123,7 @@ class FirestoreRepository:
         self._col(ws, collection).document(doc_id).delete()
 
     def clear(self, ws):
-        root = self._db.collection("workspaces").document(ws)
+        root = self._db.collection(self._root).document(ws)
         for collection in COLLECTIONS.values():
             docs = list(root.collection(collection).list_documents())
             for start in range(0, len(docs), 400):
@@ -133,11 +134,11 @@ class FirestoreRepository:
         root.delete()
 
     def get_meta(self, ws):
-        snap = self._db.collection("workspaces").document(ws).get()
+        snap = self._db.collection(self._root).document(ws).get()
         return snap.to_dict() if snap.exists else None
 
     def set_meta(self, ws, data):
-        self._db.collection("workspaces").document(ws).set(data)
+        self._db.collection(self._root).document(ws).set(data)
 
 
 class Store:

@@ -20,7 +20,9 @@ from models.domain import (
 from rules.config import VerticalConfig, load_vertical
 from rules.eligibility import hard_check
 from rules.scheduling import Interval, covers, merge, subtract
-from rules.scoring import Piece, distance_km, score_plan
+from rules.scoring import Piece, score_plan
+from services.travel import TravelEstimate
+from services.travel import get_service as travel_service
 
 MIN_PARTIAL_HOURS = 2
 MAX_OPTIONS = 3
@@ -65,6 +67,7 @@ def generate(
             continue
         eligible.append((cg, parts))
 
+    travel = travel_service().estimates({cg.id: cg.location for cg, _ in eligible}, client.location)
     plans: list[tuple[str, list[Piece]]] = []
     for cg, parts in eligible:
         if all(covers(d, parts) for d in demand):
@@ -91,7 +94,8 @@ def generate(
     unique: dict[tuple, tuple[str, list[Piece]]] = {}
     for kind, pieces in plans:
         unique.setdefault(tuple((p.caregiver.id, p.start, p.end) for p in pieces), (kind, pieces))
-    options = [_build(kind, pieces, demand, client, assignment, config, work_until) for kind, pieces in unique.values()]
+    options = [_build(kind, pieces, demand, client, assignment, config, work_until, travel)
+               for kind, pieces in unique.values()]
     feasible = sorted((o for o in options if o.feasible), key=lambda o: (-o.total, len(o.caregiver_ids)))
     infeasible = sorted((o for o in options if not o.feasible), key=lambda o: (-_familiarity(o), -o.total))
 
@@ -122,12 +126,13 @@ def _familiarity(option: ReplanOption) -> int:
 
 
 def _build(kind: str, pieces: list[Piece], demand: list[Interval], client: Client, assignment: Assignment,
-           config: VerticalConfig, work_until: date) -> ReplanOption:
+           config: VerticalConfig, work_until: date, travel: dict[str, TravelEstimate]) -> ReplanOption:
     covered = [(p.start, p.end) for p in pieces]
     gaps = subtract(demand, covered)
     people = list(dict.fromkeys(p.caregiver.id for p in pieces))
     extra_handoffs = (len(pieces) - 1) + (1 if gaps else 0)
-    factors = score_plan(pieces, demand, client, config, assignment.required_skills, work_until, extra_handoffs)
+    factors = score_plan(pieces, demand, client, config, assignment.required_skills, work_until, extra_handoffs,
+                         travel=travel)
 
     violations = []
     if gaps and config.require_full_coverage:
@@ -155,9 +160,11 @@ def _build(kind: str, pieces: list[Piece], demand: list[Interval], client: Clien
             pros.append(f"{name} knows {client.name} from {visits} visit{'s' if visits > 1 else ''}{when}")
         elif len(pieces) == 1:
             cons.append(f"{name} has never cared for {client.name}")
-        km = distance_km(p.caregiver.location, client.location)
-        if km <= 3:
-            pros.append(f"{name} is close by, {km:.1f} km away")
+        est = travel.get(p.caregiver.id)
+        if est and est.minutes is not None and est.minutes <= config.travel_full_within_min:
+            pros.append(f"{name} is close by, {est.minutes:.0f} min by road")
+        elif est and est.minutes is None and est.km <= 3:
+            pros.append(f"{name} is close by, {est.km:.1f} km away")
     if len(pieces) > 1:
         cons.append(f"One extra handover at {pieces[1].start:%H:%M}")
     for v in violations:

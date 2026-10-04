@@ -28,6 +28,7 @@ def explain_options(gemini: GeminiService, store: Store, event: ChangeEvent) -> 
         "client": client.name if client else None,
         "situation": event.impact_summary,
         "recommended": event.recommended_option_id,
+        "why_recommended": event.recommendation_note,
         "options": [{
             "id": o.id, "title": o.title, "feasible": o.feasible, "total_score": o.total,
             "max_score": sum(f.max_points for f in o.factors),

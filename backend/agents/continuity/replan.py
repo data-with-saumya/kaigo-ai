@@ -111,6 +111,7 @@ def _attach_options(store: Store, event: ChangeEvent, shift: Shift, assignment: 
     event.explanation = None
     feasible = [o for o in options if o.feasible]
     event.recommended_option_id = feasible[0].id if feasible else None
+    event.recommendation_note = _recommendation_note(feasible)
     event.status = "open" if feasible else "no_feasible_option"
     checked = len(caregivers) - len(exclude)
     summary = (f"Rechecked {checked} caregivers: {len(feasible)} feasible plan{'s' if len(feasible) != 1 else ''}"
@@ -199,3 +200,18 @@ def _review_reason(event: ChangeEvent) -> str:
         return "Couldn't tell which day the change applies to"
     return f"Low confidence ({p.confidence:.2f}) in reading the message"
 
+
+
+def _recommendation_note(feasible: list) -> str | None:
+    if not feasible:
+        return None
+    best = feasible[0]
+    tied = [o for o in feasible[1:] if o.total == best.total]
+    if tied:
+        others = ", ".join(o.id for o in tied)
+        return (f"Option {best.id} is tied on score with option {others}. Rule C-02 breaks ties in favour of "
+                f"fewer handovers. Either is a sound choice; the coordinator decides.")
+    runner = feasible[1] if len(feasible) > 1 else None
+    if runner:
+        return f"Option {best.id} has the highest continuity score ({best.total} vs {runner.total} for option {runner.id})."
+    return f"Option {best.id} is the only plan that covers the whole shift."

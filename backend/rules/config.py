@@ -28,6 +28,8 @@ class VerticalConfig:
     familiarity_full_at_visits: int
     location_full_within_km: float
     location_zero_at_km: float
+    travel_full_within_min: float
+    travel_zero_at_min: float
     ai_confidence_threshold: float
     require_full_coverage: bool
 
@@ -51,6 +53,8 @@ def load_vertical(vertical: Vertical | str) -> VerticalConfig:
         familiarity_full_at_visits=int(continuity["familiarity_full_at_visits"]),
         location_full_within_km=float(continuity["location_full_within_km"]),
         location_zero_at_km=float(continuity["location_zero_at_km"]),
+        travel_full_within_min=float(continuity["travel_full_within_min"]),
+        travel_zero_at_min=float(continuity["travel_zero_at_min"]),
         ai_confidence_threshold=float(raw["review"]["ai_confidence_threshold"]),
         require_full_coverage=bool(raw["review"]["require_full_coverage"]),
     )

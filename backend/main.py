@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from api.routes import router
 from config import get_settings
+from services import travel
 from services.gemini import AIOutputInvalid, AIUnavailable
 
 
@@ -30,6 +31,7 @@ logging.basicConfig(level=logging.INFO, handlers=[handler], force=True)
 log = logging.getLogger("kaigo")
 
 settings = get_settings()
+travel.configure(travel.TravelService(settings.travel_backend, settings.google_cloud_project))
 app = FastAPI(title="Kaigo AI", version="0.1.0",
               description="AI operations for care agencies: verify, match, and keep care running when circumstances change.")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],

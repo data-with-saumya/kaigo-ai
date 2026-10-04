@@ -33,10 +33,13 @@ class Piece:
     end: datetime
 
 
-def distance_km(a: Location, b: Location) -> float:
+def straight_line_km(a: Location, b: Location) -> float:
     lat1, lng1, lat2, lng2 = map(math.radians, (a.lat, a.lng, b.lat, b.lng))
     h = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lng2 - lng1) / 2) ** 2
     return 6371 * 2 * math.asin(math.sqrt(h))
+
+
+distance_km = straight_line_km  # backwards-compatible name
 
 
 def familiarity_share(visits: int, config: VerticalConfig) -> float:
@@ -48,6 +51,13 @@ def location_share(km: float, config: VerticalConfig) -> float:
     if km <= full:
         return 1.0
     return max(0.0, 1 - (km - full) / (zero - full))
+
+
+def travel_share(minutes: float, config: VerticalConfig) -> float:
+    full, zero = config.travel_full_within_min, config.travel_zero_at_min
+    if minutes <= full:
+        return 1.0
+    return max(0.0, 1 - (minutes - full) / (zero - full))
 
 
 def _points(weight: int, share: float) -> int:
@@ -62,6 +72,7 @@ def score_plan(
     required_skills: list[str],
     work_until: date,
     extra_handoffs: int,
+    travel: dict | None = None,
 ) -> list[Factor]:
     w = config.weights
     demand = merge(demand)
@@ -102,9 +113,23 @@ def score_plan(
         f"{cg.name.split()[0]}: {client.visit_history.get(cg.id, 0) or 'no'} previous visit"
         f"{'' if client.visit_history.get(cg.id, 0) == 1 else 's'}" for cg in people) or "Nobody assigned"
 
-    loc = weighted(lambda cg: location_share(distance_km(cg.location, client.location), config))
-    loc_detail = "; ".join(f"{cg.name.split()[0]} {distance_km(cg.location, client.location):.1f} km away"
-                           for cg in people) or "Nobody assigned"
+    travel = travel or {}
+
+    def place_share(cg: Caregiver) -> float:
+        est = travel.get(cg.id)
+        if est is not None and est.minutes is not None:
+            return travel_share(est.minutes, config)
+        return location_share(est.km if est else straight_line_km(cg.location, client.location), config)
+
+    def place_text(cg: Caregiver) -> str:
+        est = travel.get(cg.id)
+        if est is not None and est.minutes is not None:
+            return f"{cg.name.split()[0]} {est.minutes:.0f} min by road"
+        km = est.km if est else straight_line_km(cg.location, client.location)
+        return f"{cg.name.split()[0]} {km:.1f} km away (straight line)"
+
+    loc = weighted(place_share)
+    loc_detail = "; ".join(place_text(cg) for cg in people) or "Nobody assigned"
 
     if len(people) == 1:
         stab_share = coverage

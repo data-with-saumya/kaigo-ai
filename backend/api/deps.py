@@ -19,7 +19,7 @@ log = logging.getLogger("kaigo.api")
 def get_repository() -> Repository:
     settings = get_settings()
     if settings.storage_backend == "firestore":
-        return FirestoreRepository(project=settings.google_cloud_project)
+        return FirestoreRepository(project=settings.google_cloud_project, root=settings.firestore_root)
     return MemoryRepository()
 
 

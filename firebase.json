@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "kaigoai-v2",
     "public": "frontend/dist",
     "ignore": [
       "firebase.json",
@@ -10,7 +11,7 @@
       {
         "source": "/api/**",
         "run": {
-          "serviceId": "kaigo-api",
+          "serviceId": "kaigo-api-v2",
           "region": "asia-south1"
         }
       },

@@ -12,6 +12,7 @@ const config = {
 };
 
 export const firebaseEnabled = Boolean(config.apiKey && config.projectId);
+const ROOT = import.meta.env.VITE_FIRESTORE_ROOT || "workspaces";
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
@@ -62,7 +63,7 @@ export function watchWorkspace(onChange: () => void): () => void {
   let cancelled = false;
   signIn().then((uid) => {
     if (!uid || cancelled) return;
-    const latest = query(collection(db!, "workspaces", uid, "audit_logs"), orderBy("at", "desc"), limit(1));
+    const latest = query(collection(db!, ROOT, uid, "audit_logs"), orderBy("at", "desc"), limit(1));
     let first = true;
     unsubscribe = onSnapshot(latest, () => {
       if (first) { first = false; return; }

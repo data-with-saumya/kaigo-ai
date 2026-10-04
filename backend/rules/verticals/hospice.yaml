@@ -29,6 +29,9 @@ continuity:
   familiarity_full_at_visits: 4
   location_full_within_km: 3
   location_zero_at_km: 25
+  # With real road travel times (Google Maps): full points within 20 min, none beyond 75 min.
+  travel_full_within_min: 20
+  travel_zero_at_min: 75
 
 review:
   ai_confidence_threshold: 0.85

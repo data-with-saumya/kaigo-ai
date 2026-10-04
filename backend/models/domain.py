@@ -287,6 +287,7 @@ class ChangeEvent(BaseModel):
     impact_summary: str | None = None
     options: list[ReplanOption] = Field(default_factory=list)
     recommended_option_id: str | None = None
+    recommendation_note: str | None = None  # why the rules recommend it, in plain words
     excluded: list[dict] = Field(default_factory=list)  # caregivers ruled out, with the rule that did it
     explanation: OptionExplanation | None = None
     decision: Decision | None = None
