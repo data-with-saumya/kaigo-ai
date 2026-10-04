@@ -8,11 +8,15 @@ import { longDay, relativeDay, span, vertical } from "../lib/format";
 import { useAction } from "../lib/hooks";
 
 export function DashboardPage() {
-  const { dashboard: d, aiAvailable, health } = useWorkspace();
+  const { dashboard: d, dashboardError, aiAvailable, health } = useWorkspace();
   const navigate = useNavigate();
   const reset = useAction(api.reset);
 
-  if (!d) return <Page eyebrow="Operations" title="Today’s care picture"><Spinner label="Loading the care picture…" /></Page>;
+  if (!d) return (
+    <Page eyebrow="Operations" title="Today’s care picture">
+      {dashboardError ? <ErrorNotice error={dashboardError} /> : <Spinner label="Setting up your demo agency…" />}
+    </Page>
+  );
   const k = d.kpis;
   const [first, ...more] = d.alerts;
 

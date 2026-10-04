@@ -7,10 +7,11 @@ import { IconBook, IconClipboard, IconDashboard, IconLoop, IconShield, Logo } fr
 
 interface WorkspaceState {
   dashboard: Dashboard | null;
+  dashboardError: unknown;
   health: Health | null;
   aiAvailable: boolean;
 }
-const WorkspaceContext = createContext<WorkspaceState>({ dashboard: null, health: null, aiAvailable: false });
+const WorkspaceContext = createContext<WorkspaceState>({ dashboard: null, dashboardError: null, health: null, aiAvailable: false });
 export const useWorkspace = () => useContext(WorkspaceContext);
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -28,7 +29,7 @@ export function Shell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <WorkspaceContext.Provider value={{ dashboard: dashboard.data, health: health.data, aiAvailable }}>
+    <WorkspaceContext.Provider value={{ dashboard: dashboard.data, dashboardError: dashboard.error, health: health.data, aiAvailable }}>
       <div className="shell">
         <nav className="nav" aria-label="Primary">
           <Link to="/" className="brand"><Logo /><span className="brand-name">Kaigo AI</span></Link>

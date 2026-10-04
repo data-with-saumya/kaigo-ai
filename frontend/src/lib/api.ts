@@ -30,7 +30,12 @@ function localWorkspace(): string {
 async function headers(json: boolean): Promise<Record<string, string>> {
   const h: Record<string, string> = json ? { "Content-Type": "application/json" } : {};
   if (firebaseEnabled) {
-    const token = await idToken();
+    let token: string | null = null;
+    try {
+      token = await idToken();
+    } catch {
+      throw new ApiError(0, "auth", "Couldn't start a secure session for your demo workspace. Reload the page in a minute; if it keeps happening, sign-in is temporarily unavailable.");
+    }
     if (token) h.Authorization = `Bearer ${token}`;
   } else {
     h["X-Workspace-Id"] = localWorkspace();
@@ -39,9 +44,10 @@ async function headers(json: boolean): Promise<Record<string, string>> {
 }
 
 async function request<T>(path: string, init: RequestInit = {}, json = true): Promise<T> {
+  const auth = await headers(json); // sign-in problems surface as their own error, not as "network"
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { ...init, headers: { ...(await headers(json)), ...(init.headers ?? {}) } });
+    res = await fetch(`${BASE}${path}`, { ...init, headers: { ...auth, ...(init.headers ?? {}) } });
   } catch {
     throw new ApiError(0, "network", "Can't reach the Kaigo service. Check your connection and try again.");
   }

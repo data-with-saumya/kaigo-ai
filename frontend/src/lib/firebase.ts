@@ -39,6 +39,7 @@ export function signIn(): Promise<string | null> {
             await signInAnonymously(auth!);
           } catch (err) {
             stop();
+            ready = null; // let the next request try again instead of failing forever
             reject(err);
           }
         }
@@ -67,6 +68,6 @@ export function watchWorkspace(onChange: () => void): () => void {
       if (first) { first = false; return; }
       onChange();
     }, () => { /* listener errors fall back to manual refresh */ });
-  });
+  }).catch(() => { /* sign-in errors are shown by the API layer */ });
   return () => { cancelled = true; unsubscribe(); };
 }
