@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in visitor may read only their own synthetic workspace (for live updates).
+    // Every write goes through the Cloud Run API, which validates it and records an audit entry.
+    match /workspaces/{workspaceId}/{document=**} {
+      allow read: if request.auth != null && request.auth.uid == workspaceId;
+      allow write: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

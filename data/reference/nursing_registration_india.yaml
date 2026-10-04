@@ -1,0 +1,104 @@
+# Approved reference corpus for credential verification (India).
+#
+# Two kinds of entry, never mixed:
+#   - PUBLIC REFERENCE: real, publicly available regulatory information, with its source URL.
+#   - SYNTHETIC: invented for the demo (marked `synthetic: true`). The demo's fictional
+#     certificates are "issued" by a synthetic council, so no real authority's documents,
+#     seals or numbering are imitated.
+#
+# Kaigo does not query any live registry in the prototype. Production would integrate
+# with the Indian Nursing Council's NRTS and state council registries (see docs/architecture.md).
+
+authorities:
+  - id: inc
+    name: Indian Nursing Council
+    aliases: [INC]
+    kind: national
+    source_url: https://www.indiannursingcouncil.org
+    notes: >-
+      National regulator. Runs the Nurses Registration and Tracking System (NRTS), which issues
+      a National Unique Identity (NUID) to ANMs, RN & RMs and LHVs.
+
+  - id: ksnc
+    name: Karnataka State Nursing Council
+    aliases: [KSNC, Karnataka Nursing Council]
+    kind: state_council
+    source_url: https://prsindia.org/files/bills_acts/acts_states/karnataka/1962/1962KR4.pdf
+    notes: Constituted under the Karnataka Nurses, Midwives and Health Visitors Act, 1961.
+
+  - id: wbnc
+    name: West Bengal Nursing Council
+    aliases: [WBNC]
+    kind: state_council
+    source_url: https://wbnc.in
+
+  - id: knmc
+    name: Kerala Nurses and Midwives Council
+    aliases: [KNMC]
+    kind: state_council
+    notes: Name recognised. Verify registrations directly with the council.
+
+  - id: mnc
+    name: Maharashtra Nursing Council
+    aliases: [MNC]
+    kind: state_council
+    notes: Name recognised. Verify registrations directly with the council.
+
+  - id: dnc
+    name: Delhi Nursing Council
+    aliases: [DNC]
+    kind: state_council
+    notes: Name recognised. Verify registrations directly with the council.
+
+  - id: tnnmc
+    name: Tamil Nadu Nurses and Midwives Council
+    aliases: [TNNMC]
+    kind: state_council
+    notes: Name recognised. Verify registrations directly with the council.
+
+  - id: demo-snc
+    name: Demo State Nursing Council
+    aliases: [DSNC, Demo State Nursing Council (Synthetic)]
+    kind: state_council
+    synthetic: true
+    registration_pattern: '^DSNC-(RN|RNRM)-\d{4}-\d{5}$'
+    notes: >-
+      SYNTHETIC. A fictional council used to issue the demo certificates. Its number format
+      (DSNC-<category>-<year>-<5 digits>) is invented so the format rule (V-02) can be demonstrated
+      without imitating any real council's numbering.
+
+documents:
+  - id: nrts-regulations-2019
+    title: Nursing Council (Nurses Registration and Tracking System) Regulations, 2019
+    publisher: Indian Nursing Council (under the Indian Nursing Council Act, 1947)
+    url: https://www.casemine.com/act/in/5f5f13209fca195c05cd05e2
+    used_for: Registration categories (ANM, RN & RM, LHV) and the national NUID identifier
+    summary: >-
+      Establishes NRTS as a live national register of nursing personnel, covering primary
+      registration, renewal and inter-state (reciprocal) registration, and the issue of a
+      National Unique Identity (NUID).
+
+  - id: inc-nrts-notice
+    title: NRTS information published by the Indian Nursing Council
+    publisher: Indian Nursing Council
+    url: https://www.indiannursingcouncil.org/uploads/pdf/17810087304744.pdf
+    used_for: Renewal depends on completing Continuing Nursing Education (CNE) hours
+    summary: >-
+      NRTS supports registration, renewal, reciprocal registration and higher-qualification
+      registration. Renewal of the NUID requires the required CNE hours.
+
+  - id: karnataka-act-1961
+    title: Karnataka Nurses, Midwives and Health Visitors Act, 1961
+    publisher: Government of Karnataka (via PRS Legislative Research)
+    url: https://prsindia.org/files/bills_acts/acts_states/karnataka/1962/1962KR4.pdf
+    used_for: Legal basis of state registration in Karnataka (the demo agency is in Bengaluru)
+    summary: State law that constitutes the Karnataka State Nursing Council and its register.
+
+  - id: karnataka-renewal-guide
+    title: Karnataka — Renew Registration with Nursing Council (community guide)
+    publisher: WikiProcedure (secondary source)
+    url: https://wikiprocedure.com/index.php/Karnataka_-_Renew_Registration_with_Nursing_Council
+    used_for: Expiry rule V-01. Registrations carry a renewal date and must be renewed periodically
+    summary: >-
+      Describes nursing registration in Karnataka as valid for five years, renewable online.
+      Secondary source: confirm with the council before production use.

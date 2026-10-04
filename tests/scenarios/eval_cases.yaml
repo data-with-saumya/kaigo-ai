@@ -1,0 +1,58 @@
+# Ground truth for scripts/evaluate.py. Relative days are offsets from the day the evaluation runs.
+
+requests:
+  - id: R1
+    client_id: CL-0031
+    text: "Mrs Sharma needs a wound-care nurse from 6 PM to 6 AM for the next five days."
+    expect: {care_type: home_nursing, skills: [wound_care], shift_start: "18:00", shift_end: "06:00", duration_days: 5,
+             start_day_options: [0, 1]}
+  - id: R2
+    client_id: CL-0027
+    text: "Mr Iyer's family would like overnight hospice support for two nights starting tomorrow, 8 PM to 8 AM."
+    expect: {care_type: hospice, skills: [palliative_care], shift_start: "20:00", shift_end: "08:00", duration_days: 2,
+             start_day_options: [1]}
+  - id: R3
+    client_id: CL-0019
+    text: "Lakshmi needs a nurse for morning post-op visits, 8 to 2, for the next three days starting tomorrow."
+    expect: {care_type: home_nursing, skills: [post_operative_care], shift_start: "08:00", shift_end: "14:00",
+             duration_days: 3, start_day_options: [1]}
+  - id: R4
+    client_id: CL-0031
+    text: "Need someone with IV therapy experience tomorrow 9am to 5pm for Mrs Sharma, just one day."
+    expect: {care_type: home_nursing, skills: [iv_therapy], shift_start: "09:00", shift_end: "17:00", duration_days: 1,
+             start_day_options: [1]}
+  - id: R5
+    client_id: CL-0031
+    text: "Mrs Sharma had a stroke last year and is diabetic. She needs insulin support and wound dressing every night for the next 4 nights from tomorrow, 7pm to 7am."
+    expect: {care_type: home_nursing, skills: [diabetic_care, wound_care], shift_start: "19:00", shift_end: "07:00",
+             duration_days: 4, start_day_options: [1], clinical_details_omitted: true}
+  - id: R6
+    client_id: CL-0031
+    text: "Can you send a nurse for my mother for a few nights? Thanks."
+    expect: {care_type: home_nursing, must_flag: [shift_times, duration_days]}
+
+events:
+  - id: E1
+    text: "Hi, it's Anjali. Family emergency, so I can't do tomorrow night at Mrs Sharma's. Really sorry."
+    expect: {event_type: caregiver_cancellation, caregiver_id: CG-0101, day: 1, routed_to_review: false}
+  - id: E2
+    text: "Deepa here. I can only stay till midnight tonight, have to leave after that."
+    expect: {event_type: shift_change, caregiver_id: CG-0103, day: 0, routed_to_review: false}
+  - id: E3
+    text: "Kiran is unwell and won't make it to Mr Iyer's tonight."
+    expect: {event_type: caregiver_cancellation, caregiver_id: CG-0105, day: 0, routed_to_review: false}
+  - id: E4
+    text: "Hey, can't come tomorrow, sorry"
+    expect: {event_type: caregiver_cancellation, caregiver_id: null, routed_to_review: true}
+  - id: E5
+    text: "Mrs Sharma's family says she will also need IV support at night from tomorrow."
+    expect: {event_type: requirement_change, caregiver_id: null, day: 1}
+  - id: E6
+    text: "Anjali can't do the day after tomorrow, but tomorrow is fine."
+    expect: {event_type: caregiver_cancellation, caregiver_id: CG-0101, day: 2, routed_to_review: false}
+  - id: E7
+    text: "Sana asked to move tomorrow's morning visit to the afternoon."
+    expect: {event_type: shift_change, caregiver_id: CG-0106, day: 1}
+  - id: E8
+    text: "URGENT: we need someone at Mr Iyer's tonight, the family called."
+    expect: {event_type: urgent_coverage_request, day: 0}

@@ -1,0 +1,32 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+**/.env.local
+*service-account*.json
+*-key.json
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+.firebase/
+firebase-debug.log*
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Local evaluation outputs (results are summarised in docs/evaluation.md)
+eval-results/
+
+# Local editor/preview config
+.claude/launch.json

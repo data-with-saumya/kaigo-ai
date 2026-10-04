@@ -1,0 +1,35 @@
+# Vertical configuration: hospice.
+# Same engine as home nursing. Familiarity and handoffs weigh more because
+# end-of-life care is more sensitive to new faces and handovers.
+vertical: hospice
+label: Hospice
+
+credentials:
+  accepted_types: [RN, RN-RM]
+  required_fields: [caregiver_name, credential_type, registration_number, issuing_authority, issue_date, valid_until]
+  expiry_warning_days: 60
+
+skills:
+  evidence_required: [palliative_care, wound_care, iv_therapy, family_communication]
+  default_required: [palliative_care]
+
+scheduling:
+  min_rest_hours: 8
+  max_shift_hours: 12
+
+continuity:
+  weights:
+    qualification: 20
+    skills: 20
+    coverage: 15
+    familiarity: 20
+    location: 5
+    stability: 10
+    handoffs: 10
+  familiarity_full_at_visits: 4
+  location_full_within_km: 3
+  location_zero_at_km: 25
+
+review:
+  ai_confidence_threshold: 0.85
+  require_full_coverage: true

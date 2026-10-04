@@ -1,0 +1,35 @@
+# Vertical configuration: home nursing.
+# The engine is shared across verticals; only this file changes.
+vertical: home_nursing
+label: Home nursing
+
+credentials:
+  accepted_types: [RN, RN-RM]
+  required_fields: [caregiver_name, credential_type, registration_number, issuing_authority, issue_date, valid_until]
+  expiry_warning_days: 60
+
+skills:
+  # Skills that only count once a certificate or training record backs them up.
+  evidence_required: [wound_care, iv_therapy, palliative_care, tracheostomy_care]
+
+scheduling:
+  min_rest_hours: 8
+  max_shift_hours: 12
+
+continuity:
+  weights:
+    qualification: 20
+    skills: 20
+    coverage: 20
+    familiarity: 15
+    location: 10
+    stability: 10
+    handoffs: 5
+  familiarity_full_at_visits: 5
+  location_full_within_km: 2
+  location_zero_at_km: 20
+
+review:
+  ai_confidence_threshold: 0.85
+  # A replacement plan must cover the whole shift (rule C-01).
+  require_full_coverage: true

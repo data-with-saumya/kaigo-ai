@@ -1,0 +1,107 @@
+[
+  {
+    "file": "priya-nair-registration.png",
+    "kind": "registration",
+    "caregiver_id": "CG-0107",
+    "label": "Priya Nair: registration (valid)",
+    "demo": true,
+    "expected": {
+      "caregiver_name": "Priya Nair",
+      "credential_type": "RN-RM",
+      "registration_number": "DSNC-RNRM-2019-04417",
+      "issuing_authority": "Demo State Nursing Council",
+      "issue_date": "2019-06-12",
+      "valid_until": "2027-06-11"
+    },
+    "expected_status": "needs_review"
+  },
+  {
+    "file": "priya-nair-wound-care-training.png",
+    "kind": "training",
+    "caregiver_id": "CG-0107",
+    "label": "Priya Nair: wound-care training",
+    "demo": false,
+    "expected": {
+      "caregiver_name": "Priya Nair",
+      "skills": [
+        "wound care"
+      ]
+    },
+    "expected_status": null
+  },
+  {
+    "file": "rahul-menon-registration.png",
+    "kind": "registration",
+    "caregiver_id": "CG-0104",
+    "label": "Rahul Menon: registration (expired)",
+    "demo": true,
+    "expected": {
+      "caregiver_name": "Rahul Menon",
+      "credential_type": "RN",
+      "registration_number": "DSNC-RN-2016-03390",
+      "issuing_authority": "Demo State Nursing Council",
+      "issue_date": "2016-08-15",
+      "valid_until": "2026-08-14"
+    },
+    "expected_status": "blocked"
+  },
+  {
+    "file": "fatima-khan-registration.png",
+    "kind": "registration",
+    "caregiver_id": "CG-0108",
+    "label": "Fatima Khan: registration (expiry unreadable)",
+    "demo": true,
+    "expected": {
+      "caregiver_name": "Fatima Khan",
+      "credential_type": "RN",
+      "registration_number": "DSNC-RN-2022-08802",
+      "issuing_authority": "Demo State Nursing Council",
+      "issue_date": "2022-01-24",
+      "valid_until": null
+    },
+    "expected_status": "needs_review"
+  },
+  {
+    "file": "anjali-rao-registration.png",
+    "kind": "registration",
+    "caregiver_id": "CG-0101",
+    "label": "Anjali Rao: registration (valid)",
+    "demo": false,
+    "expected": {
+      "caregiver_name": "Anjali Rao",
+      "credential_type": "RN",
+      "registration_number": "DSNC-RN-2017-02281",
+      "issuing_authority": "Demo State Nursing Council",
+      "issue_date": "2017-03-02",
+      "valid_until": "2029-03-01"
+    },
+    "expected_status": "ready"
+  },
+  {
+    "file": "unknown-council-registration.png",
+    "kind": "registration",
+    "caregiver_id": null,
+    "label": "Unknown council (not in reference list)",
+    "demo": false,
+    "expected": {
+      "caregiver_name": "Arjun Varma",
+      "credential_type": "RN",
+      "registration_number": "CNR/88213",
+      "issuing_authority": "Coastal Nursing Registry",
+      "issue_date": "2020-05-05",
+      "valid_until": "2028-05-04"
+    },
+    "expected_status": "needs_review"
+  },
+  {
+    "file": "handover-note.png",
+    "kind": "other",
+    "caregiver_id": null,
+    "label": "Not a credential (handover note)",
+    "demo": false,
+    "expected": {
+      "is_credential_document": false
+    },
+    "expected_status": "needs_review"
+  }
+]
