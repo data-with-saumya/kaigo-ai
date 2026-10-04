@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { CaregiverAppPage } from "./pages/CaregiverApp";
+import { MessagesPage } from "./pages/Messages";
 import { Shell } from "./components/Shell";
 import { ContinuityPage, ReplanPage } from "./pages/Continuity";
 import { DashboardPage } from "./pages/Dashboard";
@@ -16,8 +18,20 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <Shell>
+    <>
       <ScrollToTop />
+      <Routes>
+        {/* The caregiver's phone app has no coordinator menu. */}
+        <Route path="/caregiver/:id" element={<CaregiverAppPage />} />
+        <Route path="*" element={<CoordinatorApp />} />
+      </Routes>
+    </>
+  );
+}
+
+function CoordinatorApp() {
+  return (
+    <Shell>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/verify" element={<VerifyPage />} />
@@ -27,6 +41,7 @@ export default function App() {
         <Route path="/requests/:id/match" element={<MatchPage />} />
         <Route path="/continuity" element={<ContinuityPage />} />
         <Route path="/continuity/:id" element={<ReplanPage />} />
+        <Route path="/messages" element={<MessagesPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

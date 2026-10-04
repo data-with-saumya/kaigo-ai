@@ -13,6 +13,7 @@ from models.domain import (
     ChangeEvent,
     Client,
     Credential,
+    Message,
     Shift,
     VerificationStatus,
 )
@@ -87,6 +88,7 @@ def dashboard(store: Store) -> dict:
             "requests_needing_confirmation": sum(1 for r in open_requests if r.requirements.needs_review),
             "continuity_alerts": len(alerts),
             "at_risk_shifts": sum(1 for s in shifts if shift_view(s, names, clients, expiry)["risk"]),
+            "unread_messages": sum(1 for m in store.all(Message) if not m.read_by_coordinator),
         },
         "alerts": [{
             "event_id": e.id, "status": e.status, "received_at": e.received_at,

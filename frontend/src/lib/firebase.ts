@@ -56,19 +56,21 @@ export async function idToken(): Promise<string | null> {
   return auth!.currentUser ? auth!.currentUser.getIdToken() : null;
 }
 
-/** Calls `onChange` whenever a new audit entry lands in this visitor's workspace. Returns an unsubscribe. */
+/** Calls `onChange` whenever a new audit entry or chat message lands in this visitor's workspace. */
 export function watchWorkspace(onChange: () => void): () => void {
   if (!firebaseEnabled) return () => {};
-  let unsubscribe = () => {};
+  const stops: (() => void)[] = [];
   let cancelled = false;
   signIn().then((uid) => {
     if (!uid || cancelled) return;
-    const latest = query(collection(db!, ROOT, uid, "audit_logs"), orderBy("at", "desc"), limit(1));
-    let first = true;
-    unsubscribe = onSnapshot(latest, () => {
-      if (first) { first = false; return; }
-      onChange();
-    }, () => { /* listener errors fall back to manual refresh */ });
+    for (const name of ["audit_logs", "messages"]) {
+      const latest = query(collection(db!, ROOT, uid, name), orderBy("at", "desc"), limit(1));
+      let first = true;
+      stops.push(onSnapshot(latest, () => {
+        if (first) { first = false; return; }
+        onChange();
+      }, () => { /* listener errors fall back to manual refresh */ }));
+    }
   }).catch(() => { /* sign-in errors are shown by the API layer */ });
-  return () => { cancelled = true; unsubscribe(); };
+  return () => { cancelled = true; stops.forEach((stop) => stop()); };
 }

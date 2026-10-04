@@ -76,7 +76,7 @@ export interface ParsedEvent {
 export interface OptionExplanation { summary: string; per_option: Record<string, string>; caveat: string | null }
 export interface Decision { action: "approved" | "rejected"; option_id: string | null; note: string | null; actor: string; at: string }
 export interface ChangeEvent {
-  id: string; raw_text: string | null; source: "sms" | "manual" | "system"; received_at: string;
+  id: string; raw_text: string | null; source: "sms" | "manual" | "system" | "chat"; received_at: string;
   parsed: ParsedEvent | null; parse_source: "gemini" | "manual" | "rule";
   status: "needs_review" | "open" | "no_feasible_option" | "resolved" | "rejected" | "no_impact";
   review_reason: string | null; affected_shift_ids: string[]; assignment_id: string | null;
@@ -96,7 +96,7 @@ export interface Dashboard {
     active_assignments: number; assignments_by_vertical: Record<string, number>; shifts_next_24h: number;
     uncovered_next_24h: number; uncovered_upcoming: number; pending_verifications: number;
     blocked_credentials: number; open_requests: number; requests_needing_confirmation: number; continuity_alerts: number;
-    at_risk_shifts: number;
+    at_risk_shifts: number; unread_messages: number;
   };
   alerts: { event_id: string; status: ChangeEvent["status"]; received_at: string; caregiver_name: string | null; summary: string | null; options: number }[];
   upcoming_shifts: ShiftView[];
@@ -110,3 +110,11 @@ export interface Sample { file: string; kind: string; caregiver_id: string | nul
 export interface ReferenceDoc { id: string; title: string; publisher: string; url: string; used_for: string; summary: string }
 export interface Authority { id: string; name: string; kind: string; synthetic: boolean; source_url: string | null; notes: string | null }
 export interface Reference { authorities: Authority[]; documents: ReferenceDoc[] }
+
+export interface Message {
+  id: string; caregiver_id: string; sender: "caregiver" | "coordinator" | "kaigo";
+  kind: "text" | "acknowledgement" | "confirmation" | "handover" | "notice"; text: string; at: string;
+  event_id: string | null; read_by_coordinator: boolean; read_by_caregiver: boolean;
+}
+export interface Thread { caregiver_id: string; name: string; area: string; last: Message | null; unread: number }
+export interface SendResult { message: Message; event: ChangeEvent | null; reply: Message | null; understood: boolean | null }

@@ -20,6 +20,7 @@ from models.domain import (
     Client,
     Credential,
     Decision,
+    Message,
     Shift,
 )
 
@@ -32,6 +33,7 @@ COLLECTIONS: dict[type[BaseModel], str] = {
     Shift: "shifts",
     ChangeEvent: "events",
     Decision: "approvals",
+    Message: "messages",
     AuditEntry: "audit_logs",
     AICall: "ai_calls",
 }

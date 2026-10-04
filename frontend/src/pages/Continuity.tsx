@@ -191,12 +191,15 @@ export function ReplanPage() {
     <Page eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
       actions={<span className={`chip ${tone}`} style={{ minHeight: 36, padding: "0 14px" }}>{label}</span>}>
       <div className="row stretch">
-        <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : event.source === "system" ? "Detected" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>
+        <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : event.source === "chat" ? "In-app chat" : event.source === "system" ? "Detected" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>
+          {event.source === "chat" && event.parsed?.caregiver_id && (
+            <Link to={`/messages?with=${event.parsed.caregiver_id}`} className="small" style={{ fontWeight: 600 }}>Open the conversation →</Link>
+          )}
           {event.raw_text && <blockquote style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "var(--linen)", fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 16 }}>“{event.raw_text}”</blockquote>}
           {event.parsed && (
             <>
               <div className="inline">
-                {event.parse_source === "gemini" ? <Provenance kind="ai">Gemini · read as</Provenance>
+                {event.parse_source === "gemini" ? <Provenance kind="ai">{event.source === "chat" ? "Gemini · read in-app chat as" : "Gemini · read as"}</Provenance>
                   : event.parse_source === "rule" ? <Provenance kind="rule">Rule E-02 · expiry monitor</Provenance>
                   : <Provenance kind="human">Reported by coordinator</Provenance>}
                 {event.parse_source === "gemini" && <span className="small muted">confidence {event.parsed.confidence.toFixed(2)} (review below 0.85)</span>}

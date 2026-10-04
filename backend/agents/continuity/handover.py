@@ -67,6 +67,9 @@ def write_handover(gemini: GeminiService, store: Store, event: ChangeEvent) -> C
                               "so they were withheld.")
     event.handover_notes = notes
     store.put(event)
+    from agents.messaging.chat import deliver_handover
+
+    deliver_handover(store, event)
     audit.record(store, ActorType.AI, "Gemini", "event.handover",
                  f"Wrote handover notes for {', '.join(names.get(c, c) for c in notes)} (grounding check passed)",
                  "event", event.id)

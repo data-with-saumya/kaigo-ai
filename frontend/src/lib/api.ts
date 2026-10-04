@@ -1,7 +1,7 @@
 import { firebaseEnabled, idToken } from "./firebase";
 import type {
   AuditEntry, CareRequest, Caregiver, ChangeEvent, Client, Credential, CredentialFields, Dashboard,
-  EventType, Health, MatchResult, Reference, Requirements, Sample, ShiftView,
+  EventType, Health, MatchResult, Message, Reference, Requirements, Sample, SendResult, ShiftView, Thread,
 } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? "";
@@ -75,7 +75,7 @@ export const api = {
   audit: (limit = 50) => get<AuditEntry[]>(`/api/audit?limit=${limit}`),
   reference: () => get<Reference>("/api/reference"),
   metrics: () => get<{ ai_calls: number; by_task: Record<string, { calls: number; ok: number; median_latency_ms: number | null; input_tokens: number; output_tokens: number }> }>("/api/metrics"),
-  shifts: (params: { client_id?: string; assignment_id?: string }) =>
+  shifts: (params: { client_id?: string; assignment_id?: string; caregiver_id?: string }) =>
     get<ShiftView[]>(`/api/shifts?${new URLSearchParams(params as Record<string, string>)}`),
 
   samples: () => get<Sample[]>("/api/samples"),
@@ -120,6 +120,12 @@ export const api = {
   decideEvent: (id: string, action: "approved" | "rejected", option_id?: string, note?: string) =>
     post<ChangeEvent>(`/api/events/${id}/decision`, { action, option_id, note }),
   handover: (id: string) => post<ChangeEvent>(`/api/events/${id}/handover`),
+  threads: () => get<Thread[]>("/api/threads"),
+  thread: (caregiverId: string) => get<Message[]>(`/api/threads/${caregiverId}/messages`),
+  sendMessage: (caregiverId: string, text: string, sender: "caregiver" | "coordinator") =>
+    post<SendResult>(`/api/threads/${caregiverId}/messages`, { text, sender }),
+  markRead: (caregiverId: string, by: "caregiver" | "coordinator") =>
+    post<{ marked: number }>(`/api/threads/${caregiverId}/read`, { by }),
   runChecks: () => post<{ opened: ChangeEvent[]; message: string }>("/api/continuity/scan"),
   credentialDocument: async (id: string): Promise<string> => {
     const res = await fetch(`${BASE}/api/credentials/${id}/document`, { headers: await headers(false) });

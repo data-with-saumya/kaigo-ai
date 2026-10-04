@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { api } from "../lib/api";
 import { useLive } from "../lib/hooks";
 import type { Dashboard, Health } from "../lib/types";
-import { IconBook, IconClipboard, IconDashboard, IconLoop, IconShield, Logo } from "./Icons";
+import { IconBook, IconClipboard, IconDashboard, IconLoop, IconMessage, IconShield, Logo } from "./Icons";
 
 interface WorkspaceState {
   dashboard: Dashboard | null;
@@ -25,6 +25,7 @@ export function Shell({ children }: { children: ReactNode }) {
     { to: "/verify", label: "Verification", icon: <IconShield />, badge: k?.pending_verifications },
     { to: "/requests", label: "Care requests", icon: <IconClipboard />, badge: k?.open_requests },
     { to: "/continuity", label: "Continuity", icon: <IconLoop />, badge: k?.continuity_alerts, alert: true },
+    { to: "/messages", label: "Messages", icon: <IconMessage />, badge: k?.unread_messages, alert: true },
     { to: "/how-it-works", label: "How it works", icon: <IconBook /> },
   ];
 

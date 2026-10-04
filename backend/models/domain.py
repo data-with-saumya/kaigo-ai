@@ -277,7 +277,7 @@ class Decision(BaseModel):
 class ChangeEvent(BaseModel):
     id: str
     raw_text: str | None = None
-    source: Literal["sms", "manual", "system"]
+    source: Literal["sms", "manual", "system", "chat"]
     received_at: datetime
     parsed: ParsedEvent | None = None
     parse_source: Literal["gemini", "manual", "rule"] = "gemini"
@@ -294,6 +294,19 @@ class ChangeEvent(BaseModel):
     explanation: OptionExplanation | None = None
     decision: Decision | None = None
     handover_notes: dict[str, str] = Field(default_factory=dict)  # caregiver_id -> note for the incoming caregiver
+
+
+class Message(BaseModel):
+    """In-app chat between a caregiver and the agency. One thread per caregiver."""
+    id: str
+    caregiver_id: str  # the thread
+    sender: Literal["caregiver", "coordinator", "kaigo"]
+    kind: Literal["text", "acknowledgement", "confirmation", "handover", "notice"] = "text"
+    text: str
+    at: datetime
+    event_id: str | None = None  # the change event this message created or relates to
+    read_by_coordinator: bool = False
+    read_by_caregiver: bool = False
 
 
 class AuditEntry(BaseModel):

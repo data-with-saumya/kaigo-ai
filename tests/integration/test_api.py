@@ -88,3 +88,15 @@ def test_matches_and_assignment_via_api(client):
     assert result["candidates"][0]["name"] == "Anjali Rao"
     r = client.post(f"/api/care-requests/{created['id']}/assign", json={"caregiver_id": "CG-0101"})
     assert r.status_code == 200 and "5 of 5" in r.json()["summary"]
+
+
+def test_chat_api_without_ai(client):
+    r = client.post("/api/threads/CG-0101/messages", json={"text": "Hello from the agency", "sender": "coordinator"})
+    assert r.status_code == 200 and r.json()["message"]["sender"] == "coordinator"
+    r = client.post("/api/threads/CG-0101/messages", json={"text": "Can't do tomorrow night", "sender": "caregiver"})
+    assert r.status_code == 200 and r.json()["event"] is None   # kept as chat; Gemini is off in tests
+    assert [m["sender"] for m in client.get("/api/threads/CG-0101/messages").json()] == ["coordinator", "caregiver"]
+    assert client.get("/api/dashboard").json()["kpis"]["unread_messages"] == 1
+    assert client.post("/api/threads/CG-0101/read", json={"by": "coordinator"}).json()["marked"] == 1
+    mine = client.get("/api/shifts", params={"caregiver_id": "CG-0101"}).json()
+    assert mine and all(any(s["caregiver_id"] == "CG-0101" for s in sh["segments"]) for sh in mine)

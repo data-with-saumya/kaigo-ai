@@ -18,6 +18,7 @@ from agents.continuity.replan import decide as decide_event
 from agents.continuity.understand import interpret_message, manual_event
 from agents.intake.extract import extract_credential, manual_credential
 from agents.matching.match import AssignmentError, assign, find_candidates
+from agents.messaging import chat
 from agents.request.extract import (
     RequestError,
     confirm,
@@ -116,14 +117,16 @@ def clients(store: Store = Depends(get_store)):
 
 
 @router.get("/shifts")
-def shifts(client_id: str | None = None, assignment_id: str | None = None, store: Store = Depends(get_store)):
+def shifts(client_id: str | None = None, assignment_id: str | None = None, caregiver_id: str | None = None,
+           store: Store = Depends(get_store)):
     caregivers_all = store.all(Caregiver)
     names = {c.id: c.name for c in caregivers_all}
     expiry = {c.id: c.credential_valid_until for c in caregivers_all}
     clients_by_id = {c.id: c for c in store.all(Client)}
     items = [s for s in store.all(Shift)
              if (client_id is None or s.client_id == client_id)
-             and (assignment_id is None or s.assignment_id == assignment_id)]
+             and (assignment_id is None or s.assignment_id == assignment_id)
+             and (caregiver_id is None or any(seg.caregiver_id == caregiver_id for seg in s.segments))]
     return [views.shift_view(s, names, clients_by_id, expiry) for s in sorted(items, key=lambda s: s.start)]
 
 
@@ -424,3 +427,45 @@ def nightly_expiry_scan(_: str = Depends(verify_scheduler), repo: Repository = D
         scanned += 1
         opened += len(scan_expiry(Store(repo, ws), settings.expiry_horizon_days))
     return {"workspaces_scanned": scanned, "issues_opened": opened}
+
+
+# ------------------------------------------------------------------ in-app chat
+
+
+@router.get("/threads")
+def threads(store: Store = Depends(get_store)):
+    return chat.inbox(store)
+
+
+@router.get("/threads/{caregiver_id}/messages")
+def thread_messages(caregiver_id: str, store: Store = Depends(get_store)):
+    if not store.get(Caregiver, caregiver_id):
+        raise fail(404, "not_found", "Caregiver not found.")
+    return chat.thread(store, caregiver_id)
+
+
+class MessageBody(BaseModel):
+    text: str = Field(min_length=1, max_length=1000)
+    sender: Literal["caregiver", "coordinator"]
+
+
+@router.post("/threads/{caregiver_id}/messages")
+def send_message(caregiver_id: str, body: MessageBody, store: Store = Depends(get_store),
+                 gemini: GeminiService = Depends(get_gemini)):
+    """In the demo one signed-in visitor can play both roles. In production the sender comes from the caller's
+    own login (caregivers sign in with phone + OTP) and can't be chosen."""
+    if not store.get(Caregiver, caregiver_id):
+        raise fail(404, "not_found", "Caregiver not found.")
+    if body.sender == "caregiver":
+        return chat.caregiver_says(gemini, store, caregiver_id, body.text)
+    return {"message": chat.post(store, caregiver_id, "coordinator", body.text), "event": None, "reply": None,
+            "understood": None}
+
+
+class ReadBody(BaseModel):
+    by: Literal["caregiver", "coordinator"]
+
+
+@router.post("/threads/{caregiver_id}/read")
+def read_thread(caregiver_id: str, body: ReadBody, store: Store = Depends(get_store)):
+    return {"marked": chat.mark_read(store, caregiver_id, body.by)}

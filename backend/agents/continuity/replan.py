@@ -194,6 +194,9 @@ def decide(store: Store, event_id: str, action: str, option_id: str | None, note
                  "assignment", assignment.id,
                  {"event_id": event.id, "option_id": option.id, "assignment_version": assignment.version,
                   "recommended": event.recommended_option_id})
+    from agents.messaging.chat import notify_decision  # tell the people involved, in their app threads
+
+    notify_decision(store, event)
     if event.parsed and event.parsed.event_type == EventType.CREDENTIAL_EXPIRY:
         from agents.continuity.monitor import scan  # the next at-risk shift, if any, becomes the next event
 
