@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 
 from models.domain import ActorType, AuditEntry
 from services import clock
@@ -25,7 +26,7 @@ def record(
 ) -> AuditEntry:
     entry = AuditEntry(
         id=new_id("AL"),
-        at=clock.now(),
+        at=datetime.now(clock.TZ),  # full precision keeps same-second entries in order
         actor_type=actor_type,
         actor=actor,
         action=action,

@@ -25,9 +25,9 @@ os.chdir(ROOT / "backend")  # so backend/.env is picked up
 import yaml  # noqa: E402
 
 from agents.continuity.understand import interpret_message  # noqa: E402
-from agents.simulation.explain import explain_options  # noqa: E402
 from agents.intake.extract import extract_credential  # noqa: E402
 from agents.request.extract import extract_request  # noqa: E402
+from agents.simulation.explain import explain_options  # noqa: E402
 from config import get_settings  # noqa: E402
 from models.domain import AICall  # noqa: E402
 from rules.config import normalise_credential_type  # noqa: E402
