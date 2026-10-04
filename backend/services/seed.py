@@ -151,7 +151,7 @@ def build(anchor: date, scenario: str = "fresh") -> list[BaseModel]:
                care_notes="Family would like the same night nurse wherever possible."),
         Client(id=PILLAI, name="Lakshmi Pillai", location=Location(area="Indiranagar", lat=12.9719, lng=77.6412),
                vertical=v, prefer_familiar=False, visit_history={SANA: 3, "CG-0115": 2},
-               care_notes="Morning visits after knee surgery."),
+               care_notes="Prefers morning visits. A family member is at home until 08:00."),
     ]
 
     records: list[BaseModel] = [*caregivers, *clients]
