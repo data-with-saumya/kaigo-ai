@@ -6,12 +6,27 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 | | |
 |---|---|
-| Live prototype | https://kaigoai-v1-510607.web.app |
+| Live prototype (v2, this branch) | https://kaigoai-v2.web.app |
+| Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
 | Source code | https://github.com/data-with-saumya/kaigo-ai |
 | Demo video (under 3 min) | _[link]_ |
 | Pitch deck (PDF) | _[link]_ |
 
 ---
+
+## What's new in v2
+
+v2 moves Kaigo from a scripted demo towards a working operations tool. v1 stays live and unchanged on `main`.
+
+| Capability | How it works | Google Cloud |
+|---|---|---|
+| **Real travel times** | The location factor uses actual driving time to the client, not straight-line distance. Results are cached; if Maps is unavailable it falls back to distance and says so | Maps Routes API, called with the service's own identity (no API key) |
+| **Proactive continuity** (rule E-02) | Every night Kaigo finds shifts a caregiver can't legally finish because their registration lapses first, flags them as at risk, and opens an early replanning event. Approving one opens the next | Cloud Scheduler → Cloud Run, OIDC-verified job |
+| **Handover notes** | After a replacement is approved, Gemini briefs each incoming caregiver: hours, who they take over from and hand over to, the client's stated preferences. Grounding-checked against the approved plan; never clinical | Gemini |
+| **Tie-break rule C-02** | When plans tie on score, fewer handovers wins, and the UI says why | — |
+| **Private document storage** | Uploaded originals are stored privately, only readable by their own workspace, and deleted after 30 days | Cloud Storage (public access prevented, lifecycle rule) |
+
+v2 runs as a separate deployment: Hosting site `kaigoai-v2`, Cloud Run service `kaigo-api-v2`, Firestore root `workspaces_v2`.
 
 ## The problem
 
