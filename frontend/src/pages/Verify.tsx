@@ -119,6 +119,9 @@ function CredentialDetail({ credential: c, sampleFiles, reference, onChanged }: 
   onChanged: () => void;
 }) {
   const [note, setNote] = useState("");
+  const [original, setOriginal] = useState<string | null>(null);
+  const loadOriginal = useAction(() => api.credentialDocument(c.id));
+  useEffect(() => { setOriginal(null); }, [c.id]);
   const decide = useAction((action: "approve" | "reject") => api.decideCredential(c.id, action, note || undefined));
   const passed = c.checks.filter((x) => x.passed).length;
   const blocking = c.checks.find((x) => x.severity === "block");
@@ -165,6 +168,17 @@ function CredentialDetail({ credential: c, sampleFiles, reference, onChanged }: 
         <ErrorNotice error={decide.error} />
       </Card>
 
+      {c.storage_path && !sampleFiles.includes(c.document_name) && (
+        <Card title="Original document" actions={<span className="chip rule">Private · Cloud Storage</span>}>
+          {original ? (c.mime_type === "application/pdf"
+            ? <a className="btn secondary small" href={original} target="_blank" rel="noreferrer">Open PDF</a>
+            : <figure className="doc-preview"><img src={original} alt={`Uploaded document: ${c.document_name}`} /></figure>)
+            : <button className="btn secondary small" style={{ alignSelf: "flex-start" }} disabled={loadOriginal.busy}
+                onClick={async () => { const url = await loadOriginal.run(); if (url) setOriginal(url); }}>View the uploaded original</button>}
+          <ErrorNotice error={loadOriginal.error} />
+          <p className="small muted">Stored privately for this workspace only and deleted automatically after 30 days.</p>
+        </Card>
+      )}
       {sampleFiles.includes(c.document_name) && (
         <figure className="doc-preview">
           <img src={api.sampleUrl(c.document_name)} alt={`Synthetic document: ${c.document_name}`} />

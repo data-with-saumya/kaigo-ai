@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
+from agents.continuity.handover import HandoverError, write_handover
+from agents.continuity.monitor import scan as scan_expiry
 from agents.continuity.replan import DecisionError, StaleStateError
 from agents.continuity.replan import decide as decide_event
 from agents.continuity.understand import interpret_message, manual_event
@@ -26,7 +28,15 @@ from agents.request.extract import (
 from agents.simulation.explain import explain_matches, explain_options
 from agents.verification.verify import VerificationError
 from agents.verification.verify import decide as decide_credential
-from api.deps import get_gemini, get_settings, get_store, reset_workspace
+from api.deps import (
+    get_documents,
+    get_gemini,
+    get_repository,
+    get_settings,
+    get_store,
+    reset_workspace,
+    verify_scheduler,
+)
 from config import Settings
 from models.domain import (
     Assignment,
@@ -41,10 +51,11 @@ from models.domain import (
     Requirements,
     Shift,
 )
-from services import views
+from services import clock, views
+from services.documents import DocumentStore
 from services.gemini import GeminiService
 from services.reference import load_reference
-from services.repository import Store
+from services.repository import Repository, Store
 
 router = APIRouter(prefix="/api")
 SAMPLES_DIR = Path(__file__).resolve().parents[2] / "data" / "synthetic" / "documents"
@@ -106,12 +117,14 @@ def clients(store: Store = Depends(get_store)):
 
 @router.get("/shifts")
 def shifts(client_id: str | None = None, assignment_id: str | None = None, store: Store = Depends(get_store)):
-    names = {c.id: c.name for c in store.all(Caregiver)}
+    caregivers_all = store.all(Caregiver)
+    names = {c.id: c.name for c in caregivers_all}
+    expiry = {c.id: c.credential_valid_until for c in caregivers_all}
     clients_by_id = {c.id: c for c in store.all(Client)}
     items = [s for s in store.all(Shift)
              if (client_id is None or s.client_id == client_id)
              and (assignment_id is None or s.assignment_id == assignment_id)]
-    return [views.shift_view(s, names, clients_by_id) for s in sorted(items, key=lambda s: s.start)]
+    return [views.shift_view(s, names, clients_by_id, expiry) for s in sorted(items, key=lambda s: s.start)]
 
 
 @router.get("/assignments")
@@ -158,7 +171,8 @@ def credential(credential_id: str, store: Store = Depends(get_store)):
 @router.post("/credentials/extract")
 async def extract(file: UploadFile | None = File(default=None), sample: str | None = Form(default=None),
                   caregiver_id: str | None = Form(default=None), store: Store = Depends(get_store),
-                  gemini: GeminiService = Depends(get_gemini), settings: Settings = Depends(get_settings)):
+                  gemini: GeminiService = Depends(get_gemini), settings: Settings = Depends(get_settings),
+                  documents: DocumentStore = Depends(get_documents)):
     if sample:
         path = (SAMPLES_DIR / sample).resolve()
         if path.parent != SAMPLES_DIR.resolve() or not path.exists():
@@ -175,7 +189,22 @@ async def extract(file: UploadFile | None = File(default=None), sample: str | No
         raise fail(400, "no_file", "Attach a document or choose a sample.")
     if caregiver_id and not store.get(Caregiver, caregiver_id):
         raise fail(404, "not_found", "Caregiver not found.")
-    return extract_credential(gemini, store, data, mime, name, caregiver_id)
+    credential = extract_credential(gemini, store, data, mime, name, caregiver_id)
+    if file is not None and documents.enabled:
+        credential.storage_path = documents.save(store.ws, credential.id, name, data, mime)
+        credential.mime_type = mime
+        store.put(credential)
+    return credential
+
+
+@router.get("/credentials/{credential_id}/document")
+def credential_document(credential_id: str, store: Store = Depends(get_store),
+                        documents: DocumentStore = Depends(get_documents)):
+    found = store.get(Credential, credential_id)
+    if not found or not found.storage_path or not documents.belongs_to(found.storage_path, store.ws):
+        raise fail(404, "not_found", "No stored document for this credential.")
+    return Response(content=documents.load(found.storage_path), media_type=found.mime_type or "application/octet-stream",
+                    headers={"Cache-Control": "private, max-age=300"})
 
 
 class ManualCredentialBody(BaseModel):
@@ -363,3 +392,35 @@ def event_decision(event_id: str, body: EventDecisionBody, store: Store = Depend
         raise fail(409, "stale_options", str(exc), event=exc.event.model_dump(mode="json"))
     except DecisionError as exc:
         raise fail(409, "cannot_decide", str(exc))
+
+
+@router.post("/events/{event_id}/handover")
+def handover(event_id: str, store: Store = Depends(get_store), gemini: GeminiService = Depends(get_gemini)):
+    found = store.get(ChangeEvent, event_id)
+    if not found:
+        raise fail(404, "not_found", "Event not found.")
+    try:
+        return write_handover(gemini, store, found)
+    except HandoverError as exc:
+        raise fail(409, "not_ready", str(exc))
+
+
+@router.post("/continuity/scan")
+def run_checks(store: Store = Depends(get_store), settings: Settings = Depends(get_settings)):
+    """Run the proactive checks now (the same ones Cloud Scheduler runs nightly)."""
+    opened = scan_expiry(store, settings.expiry_horizon_days)
+    return {"opened": opened, "message": f"{len(opened)} new issue{'s' if len(opened) != 1 else ''} found."}
+
+
+@router.post("/internal/jobs/expiry-scan", include_in_schema=False)
+def nightly_expiry_scan(_: str = Depends(verify_scheduler), repo: Repository = Depends(get_repository),
+                        settings: Settings = Depends(get_settings)):
+    """Nightly job: scan every workspace used in the last week."""
+    cutoff = (clock.now() - timedelta(days=7)).isoformat()
+    scanned = opened = 0
+    for ws, meta in repo.workspaces():
+        if meta.get("seeded_at", "") < cutoff:
+            continue
+        scanned += 1
+        opened += len(scan_expiry(Store(repo, ws), settings.expiry_horizon_days))
+    return {"workspaces_scanned": scanned, "issues_opened": opened}

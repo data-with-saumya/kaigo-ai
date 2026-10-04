@@ -30,6 +30,8 @@ export function ContinuityPage() {
   const [manual, setManual] = useState({ caregiver_id: "CG-0101", date: tomorrow, event_type: "caregiver_cancellation" as EventType, note: "" });
   const interpret = useAction(() => api.interpret(text));
   const report = useAction(() => api.reportEvent(manual.caregiver_id, manual.date, manual.event_type, manual.note || undefined));
+  const checks = useAction(api.runChecks);
+  const [checkMessage, setCheckMessage] = useState<string | null>(null);
   const go = (e: ChangeEvent | undefined) => { if (e) navigate(`/continuity/${e.id}`); };
 
   return (
@@ -75,6 +77,19 @@ export function ContinuityPage() {
         </Card>
       </div>
 
+      <Card title="Proactive checks" className="linen" actions={<span className="chip rule">Rule E-02 · Cloud Scheduler, nightly</span>}>
+        <p className="small" style={{ color: "var(--ink-2)" }}>Kaigo doesn’t wait for a cancellation. Every night it checks upcoming shifts for caregivers whose registration lapses before the shift ends, and opens a replanning event early.</p>
+        <div className="inline">
+          <button className="btn secondary small" disabled={checks.busy} onClick={async () => {
+            const r = await checks.run();
+            if (r) { setCheckMessage(r.message); if (r.opened.length) navigate(`/continuity/${r.opened[0].id}`); }
+          }}>Run checks now</button>
+          {checks.busy && <Spinner label="Checking upcoming shifts…" />}
+          {checkMessage && <span className="small muted">{checkMessage}</span>}
+        </div>
+        <ErrorNotice error={checks.error} />
+      </Card>
+
       <Card title="Changes">
         {events.data?.length === 0 && <p className="muted">No changes reported yet. Try the example message above.</p>}
         {events.data?.map((e) => {
@@ -82,7 +97,7 @@ export function ContinuityPage() {
           return (
             <Link key={e.id} to={`/continuity/${e.id}`} className="spread" style={{ textDecoration: "none", color: "inherit", padding: "10px 0", borderBottom: "1px solid var(--seam-soft)" }}>
               <span className="stack-sm" style={{ gap: 0, minWidth: 0, flex: "1 1 300px" }}>
-                <strong>{e.parsed?.caregiver_name ?? "Unknown sender"}: {e.parsed?.event_type.replace(/_/g, " ") ?? "unclear message"}</strong>
+                <strong>{e.parse_source === "rule" ? "Expiry monitor" : e.parsed?.caregiver_name ?? "Unknown sender"}: {e.parsed?.event_type.replace(/_/g, " ") ?? "unclear message"}{e.parse_source === "rule" ? ` · ${e.parsed?.caregiver_name}` : ""}</strong>
                 <span className="small muted">{relativeDay(e.received_at)} {time(e.received_at)} · {e.impact_summary ?? e.review_reason ?? e.raw_text}</span>
               </span>
               <span className={`chip ${tone}`}>{label}</span>
@@ -106,6 +121,7 @@ export function ReplanPage() {
   const [note, setNote] = useState("");
   const [stale, setStale] = useState<string | null>(null);
   const explain = useAction(() => api.explainEvent(id));
+  const handover = useAction(() => api.handover(id));
   const [deciding, setDeciding] = useState(false);
   const [decideError, setDecideError] = useState<unknown>(null);
   const names = useMemo(() => Object.fromEntries((caregivers.data ?? []).map((c) => [c.id, c.name])), [caregivers.data]);
@@ -126,6 +142,15 @@ export function ReplanPage() {
   useEffect(() => {
     if (event && aiAvailable && event.status === "open" && !event.explanation && !explain.busy && !explain.error) {
       explain.run().then((e) => { if (e) setEvent(e); });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event?.id, event?.status, aiAvailable]);
+
+  // After approval, brief the incoming caregivers.
+  useEffect(() => {
+    if (event && aiAvailable && event.status === "resolved" && event.decision?.action === "approved"
+        && Object.keys(event.handover_notes ?? {}).length === 0 && !handover.busy && !handover.error) {
+      handover.run().then((e) => { if (e) setEvent(e); });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event?.id, event?.status, aiAvailable]);
@@ -166,12 +191,14 @@ export function ReplanPage() {
     <Page eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
       actions={<span className={`chip ${tone}`} style={{ minHeight: 36, padding: "0 14px" }}>{label}</span>}>
       <div className="row stretch">
-        <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>
+        <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : event.source === "system" ? "Detected" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>
           {event.raw_text && <blockquote style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "var(--linen)", fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 16 }}>“{event.raw_text}”</blockquote>}
           {event.parsed && (
             <>
               <div className="inline">
-                {event.parse_source === "gemini" ? <Provenance kind="ai">Gemini · read as</Provenance> : <Provenance kind="human">Reported by coordinator</Provenance>}
+                {event.parse_source === "gemini" ? <Provenance kind="ai">Gemini · read as</Provenance>
+                  : event.parse_source === "rule" ? <Provenance kind="rule">Rule E-02 · expiry monitor</Provenance>
+                  : <Provenance kind="human">Reported by coordinator</Provenance>}
                 {event.parse_source === "gemini" && <span className="small muted">confidence {event.parsed.confidence.toFixed(2)} (review below 0.85)</span>}
               </div>
               <dl style={{ display: "grid", gridTemplateColumns: "120px minmax(0,1fr)", gap: "8px 14px", margin: 0, fontSize: 14 }}>
@@ -215,6 +242,7 @@ export function ReplanPage() {
             <h2 id="opt-title" className="section-title">Replacement options</h2>
             <span className="small muted">Every caregiver rechecked against requirements, credentials and schedules · {event.excluded.length} ruled out</span>
           </div>
+          {event.recommendation_note && <Notice tone="info"><strong>Rules recommend option {event.recommended_option_id}.</strong> {event.recommendation_note}</Notice>}
           {event.status === "no_feasible_option" && (
             <Notice tone="risk"><strong>No feasible replacement.</strong> No plan covers the whole shift within the rules. Escalate, or widen the search (more distance, partner agencies). Partial plans are shown for transparency.</Notice>
           )}
@@ -312,6 +340,24 @@ export function ReplanPage() {
             </Card>
           </div>
         </div>
+      )}
+      {event.status === "resolved" && event.decision?.action === "approved" && (
+        <Card title="Handover notes for the incoming caregivers" actions={<span className="chip ai"><IconSpark size={12} />Gemini · drafted</span>}>
+          {Object.keys(event.handover_notes ?? {}).length > 0 ? (
+            <div className="grid-auto" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+              {Object.entries(event.handover_notes).map(([cid, note]) => (
+                <div key={cid} className="card" style={{ padding: 16, gap: 8, background: "var(--linen)", borderColor: "transparent" }}>
+                  <strong>{names[cid] ?? cid}</strong>
+                  <p style={{ fontSize: 15, lineHeight: 1.6 }}>{note}</p>
+                </div>
+              ))}
+            </div>
+          ) : handover.busy ? <Spinner label="Gemini is drafting handover notes…" />
+            : !aiAvailable ? <p className="muted">Gemini is unavailable, so no handover notes were drafted. The new schedule is saved.</p>
+            : <div className="stack"><ErrorNotice error={handover.error} />
+                <button className="btn secondary small" style={{ alignSelf: "flex-start" }} onClick={async () => { const e = await handover.run(); if (e) setEvent(e); }}>Draft handover notes</button></div>}
+          <p className="small muted">Operational only: times, who hands over to whom, the client’s stated preferences. Checked against the approved plan; never clinical.</p>
+        </Card>
       )}
       {event.excluded.length > 0 && (
         <Card title="Ruled out for this shift" className="linen">

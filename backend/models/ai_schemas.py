@@ -80,3 +80,12 @@ class CandidateNote(BaseModel):
 
 class MatchExplanationOut(BaseModel):
     candidates: list[CandidateNote]
+
+
+class HandoverNote(BaseModel):
+    caregiver_id: str
+    note: str = Field(description="Three to five sentences, operational only, using only the facts provided.")
+
+
+class HandoverOut(BaseModel):
+    notes: list[HandoverNote]

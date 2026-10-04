@@ -32,7 +32,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <WorkspaceContext.Provider value={{ dashboard: dashboard.data, dashboardError: dashboard.error, health: health.data, aiAvailable }}>
       <div className="shell">
         <nav className="nav" aria-label="Primary">
-          <Link to="/" className="brand"><Logo /><span className="brand-name">Kaigo AI</span></Link>
+          <Link to="/" className="brand"><Logo /><span className="brand-name">Kaigo AI</span><span className="tag rule" title="Version 2: real travel times, proactive checks, handover notes">v2</span></Link>
           <div className="nav-section">
             <div className="nav-label">Operations</div>
             {nav.map((item) => (

@@ -28,9 +28,6 @@ def hard_check(
     if caregiver.verification_status != VerificationStatus.VERIFIED:
         return _fail("M-01", "Verification not approved",
                      "Credential verification hasn't been approved by a coordinator yet.")
-    if valid_until is not None and valid_until < work_until:
-        return _fail("V-01", "Registration expires before the work ends",
-                     f"Registration expires {valid_until:%d %b %Y}, before the last shift.")
 
     if required_credentials and caregiver.credential_type not in required_credentials:
         return _fail("M-03", "Credential type not accepted",
@@ -43,6 +40,10 @@ def hard_check(
         detail = (f"{names.capitalize()} claimed but not evidenced." if claimed
                   else f"No evidence of {names} skill.")
         return _fail("M-02", "Required skill missing", detail)
+    # Checked last, so a caregiver who is unsuitable anyway is reported for the more basic reason.
+    if valid_until is not None and valid_until < work_until:
+        return _fail("V-01", "Registration expires before the work ends",
+                     f"Registration expires {valid_until:%d %b %Y}, before the last shift.")
     return None
 
 

@@ -40,6 +40,14 @@ JAYANAGAR = (12.9250, 77.5938)
 AUTHORITY = "Demo State Nursing Council"
 
 RAHUL_EXPIRY = date(2026, 8, 14)  # matches his synthetic certificate; expired throughout the competition
+
+
+def SANA_EXPIRY(d: date) -> date:  # noqa: N802
+    """Sana's registration lapses partway through Lakshmi Pillai's visits: the expiry monitor's story."""
+    return d + timedelta(days=3)
+
+
+POST_OP_NURSES = {"CG-0112", "CG-0115"}  # day nurses with evidenced post-operative care
 ANJALI, PRIYA, DEEPA, RAHUL, KIRAN, SANA, FATIMA = (
     "CG-0101", "CG-0107", "CG-0103", "CG-0104", "CG-0105", "CG-0106", "CG-0108")
 MEERA, IYER, PILLAI = "CL-0031", "CL-0027", "CL-0019"
@@ -109,7 +117,7 @@ def build(anchor: date, scenario: str = "fresh") -> list[BaseModel]:
                   skills=_skills(("post_operative_care", True, None), ("mobility_assistance", True, None),
                                  ("wound_care", False, None)),
                   location=Location(area="Indiranagar", lat=12.9784, lng=77.6408), verticals=[v], availability=always,
-                  credential_id="CRD-0106", credential_valid_until=d + timedelta(days=400),
+                  credential_id="CRD-0106", credential_valid_until=SANA_EXPIRY(d),
                   verification_status=VerificationStatus.VERIFIED),
         Caregiver(id=FATIMA, name="Fatima Khan", credential_type="RN", years_experience=3,
                   skills=_skills(("elderly_care", True, None)),
@@ -126,9 +134,10 @@ def build(anchor: date, scenario: str = "fresh") -> list[BaseModel]:
         ("CG-0115", "Imran Qureshi", "Richmond Town", (2.2, 4.8)),
     ]
     for cid, name, area, (dx, dy) in day_nurses:
+        extra = [("post_operative_care", True, "Post-operative care course record")] if cid in POST_OP_NURSES else []
         caregivers.append(Caregiver(
             id=cid, name=name, credential_type="RN", years_experience=5,
-            skills=_skills(("wound_care", True, "Wound-care training record"), ("elderly_care", True, None)),
+            skills=_skills(("wound_care", True, "Wound-care training record"), ("elderly_care", True, None), *extra),
             location=_near(dx, dy, area), verticals=[v], availability=days_only(),
             credential_id=None, credential_valid_until=d + timedelta(days=500),
             verification_status=VerificationStatus.VERIFIED))
@@ -141,7 +150,7 @@ def build(anchor: date, scenario: str = "fresh") -> list[BaseModel]:
                vertical=Vertical.HOSPICE, prefer_familiar=True, visit_history={KIRAN: 6},
                care_notes="Family would like the same night nurse wherever possible."),
         Client(id=PILLAI, name="Lakshmi Pillai", location=Location(area="Indiranagar", lat=12.9719, lng=77.6412),
-               vertical=v, prefer_familiar=False, visit_history={SANA: 3},
+               vertical=v, prefer_familiar=False, visit_history={SANA: 3, "CG-0115": 2},
                care_notes="Morning visits after knee surgery."),
     ]
 
@@ -183,7 +192,7 @@ def _credentials(d: date, after: bool, caregivers: dict[str, Caregiver]) -> list
         ("CRD-0105", KIRAN, "kiran-dsouza-registration.png", "Kiran D'Souza", "RN", "DSNC-RN-2014-01128",
          date(2014, 2, 10), d + timedelta(days=700), ["palliative care", "wound care"], {}),
         ("CRD-0106", SANA, "sana-sheikh-registration.png", "Sana Sheikh", "RN", "DSNC-RN-2021-05530",
-         date(2021, 11, 5), d + timedelta(days=400), ["post-operative care"], {}),
+         date(2021, 11, 5), SANA_EXPIRY(d), ["post-operative care"], {}),
         ("CRD-0108", FATIMA, "fatima-khan-registration.png", "Fatima Khan", "RN", "DSNC-RN-2022-08802",
          date(2022, 1, 24), None, ["elderly care"], {"valid_until": 0.31}),
     ]

@@ -119,4 +119,11 @@ export const api = {
   explainEvent: (id: string) => post<ChangeEvent>(`/api/events/${id}/explain`),
   decideEvent: (id: string, action: "approved" | "rejected", option_id?: string, note?: string) =>
     post<ChangeEvent>(`/api/events/${id}/decision`, { action, option_id, note }),
+  handover: (id: string) => post<ChangeEvent>(`/api/events/${id}/handover`),
+  runChecks: () => post<{ opened: ChangeEvent[]; message: string }>("/api/continuity/scan"),
+  credentialDocument: async (id: string): Promise<string> => {
+    const res = await fetch(`${BASE}/api/credentials/${id}/document`, { headers: await headers(false) });
+    if (!res.ok) throw new ApiError(res.status, "not_found", "The stored document couldn't be loaded.");
+    return URL.createObjectURL(await res.blob());
+  },
 };

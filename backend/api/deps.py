@@ -9,6 +9,7 @@ from fastapi import Depends, Header, HTTPException
 
 from config import Settings, get_settings
 from services import clock, seed
+from services.documents import DocumentStore
 from services.gemini import GeminiService
 from services.repository import FirestoreRepository, MemoryRepository, Repository, Store
 
@@ -26,6 +27,32 @@ def get_repository() -> Repository:
 @lru_cache
 def get_gemini() -> GeminiService:
     return GeminiService(get_settings())
+
+
+@lru_cache
+def get_documents() -> DocumentStore:
+    settings = get_settings()
+    return DocumentStore(settings.documents_bucket, settings.firestore_root)
+
+
+def verify_scheduler(authorization: str | None = Header(default=None),
+                     settings: Settings = Depends(get_settings)) -> str:
+    """Only Cloud Scheduler's service account, with a Google-signed OIDC token, may trigger jobs."""
+    if not (settings.job_audience and settings.scheduler_service_account):
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Not found."})
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail={"code": "unauthenticated", "message": "Missing token."})
+    import google.auth.transport.requests
+    from google.oauth2 import id_token
+
+    try:
+        claims = id_token.verify_oauth2_token(authorization.split(" ", 1)[1], google.auth.transport.requests.Request(),
+                                              audience=settings.job_audience)
+    except Exception:
+        raise HTTPException(status_code=401, detail={"code": "unauthenticated", "message": "Invalid token."})
+    if claims.get("email") != settings.scheduler_service_account or not claims.get("email_verified"):
+        raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Not allowed."})
+    return claims["email"]
 
 
 @lru_cache

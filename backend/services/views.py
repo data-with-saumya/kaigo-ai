@@ -22,9 +22,16 @@ from services.repository import Store
 OPEN_EVENT_STATES = ("open", "needs_review", "no_feasible_option")
 
 
-def shift_view(shift: Shift, names: dict[str, str], clients: dict[str, Client]) -> dict:
+def shift_view(shift: Shift, names: dict[str, str], clients: dict[str, Client],
+               expiry: dict[str, object] | None = None) -> dict:
     client = clients.get(shift.client_id)
+    risk = None
+    for seg in shift.segments:
+        valid_until = (expiry or {}).get(seg.caregiver_id) if seg.caregiver_id else None
+        if valid_until and valid_until < seg.end.date():
+            risk = f"{names.get(seg.caregiver_id)}'s registration expires {clock.day_label(valid_until)} (rule E-02)"
     return {
+        "risk": risk,
         "id": shift.id, "assignment_id": shift.assignment_id, "index": shift.index,
         "client_id": shift.client_id, "client_name": client.name if client else shift.client_id,
         "vertical": client.vertical.value if client else None,
@@ -40,6 +47,7 @@ def dashboard(store: Store) -> dict:
     names = {c.id: c.name for c in caregivers}
     clients = {c.id: c for c in store.all(Client)}
     shifts = sorted((s for s in store.all(Shift) if s.end > now), key=lambda s: s.start)
+    expiry = {c.id: c.credential_valid_until for c in caregivers}
     assignments = [a for a in store.all(Assignment) if a.status == "active"]
     requests = store.all(CareRequest)
     events = sorted(store.all(ChangeEvent), key=lambda e: e.received_at, reverse=True)
@@ -78,6 +86,7 @@ def dashboard(store: Store) -> dict:
             "open_requests": len(open_requests),
             "requests_needing_confirmation": sum(1 for r in open_requests if r.requirements.needs_review),
             "continuity_alerts": len(alerts),
+            "at_risk_shifts": sum(1 for s in shifts if shift_view(s, names, clients, expiry)["risk"]),
         },
         "alerts": [{
             "event_id": e.id, "status": e.status, "received_at": e.received_at,
@@ -85,7 +94,7 @@ def dashboard(store: Store) -> dict:
             "summary": e.impact_summary or e.review_reason or (e.parsed.summary if e.parsed else e.raw_text),
             "options": len(e.options),
         } for e in alerts],
-        "upcoming_shifts": [shift_view(s, names, clients) for s in shifts[:12]],
+        "upcoming_shifts": [shift_view(s, names, clients, expiry) for s in shifts[:12]],
         "pending_verifications": pending,
         "open_requests": [{
             "id": r.id, "client_name": clients[r.client_id].name if r.client_id in clients else r.client_id,

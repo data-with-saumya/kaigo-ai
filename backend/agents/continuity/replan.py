@@ -88,10 +88,17 @@ def open_event(store: Store, event: ChangeEvent, threshold: float = 0.85) -> Cha
     event.affected_shift_ids = [s.id for s in affected]
     event.assignment_id = assignment.id
     event.assignment_version = assignment.version
-    event.impact_summary = (f"{who.name} was the only caregiver on shift {shift.index} of {nights} for {client.name} "
-                            f"({clock.day_label(shift.start)}), so {gap} is now uncovered.")
+    if parsed.event_type == EventType.CREDENTIAL_EXPIRY and who and who.credential_valid_until:
+        event.impact_summary = (f"{who.name}'s registration expires {clock.day_label(who.credential_valid_until)}, "
+                                f"before shift {shift.index} of {nights} for {client.name} ends "
+                                f"({clock.day_label(shift.start)}). {gap} has been released for an early replacement.")
+    else:
+        event.impact_summary = (f"{who.name} was the only caregiver on shift {shift.index} of {nights} for "
+                                f"{client.name} ({clock.day_label(shift.start)}), so {gap} is now uncovered.")
     if len(affected) > 1:
-        event.impact_summary += f" {len(affected) - 1} more shift(s) are affected and listed for follow-up."
+        more = len(affected) - 1
+        event.impact_summary += (f" {more} more shift{'s are' if more > 1 else ' is'} affected and will be "
+                                 "handled next, one at a time.")
     audit.record(store, ActorType.RULE, "Rule S-04", "event.impact",
                  f"Found affected assignment: {client.name}, shift {shift.index} of {nights}; marked {gap} uncovered",
                  "shift", shift.id, {"event_id": event.id})
@@ -187,6 +194,10 @@ def decide(store: Store, event_id: str, action: str, option_id: str | None, note
                  "assignment", assignment.id,
                  {"event_id": event.id, "option_id": option.id, "assignment_version": assignment.version,
                   "recommended": event.recommended_option_id})
+    if event.parsed and event.parsed.event_type == EventType.CREDENTIAL_EXPIRY:
+        from agents.continuity.monitor import scan  # the next at-risk shift, if any, becomes the next event
+
+        scan(store)
     return event
 
 

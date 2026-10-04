@@ -122,6 +122,8 @@ class Credential(BaseModel):
     uploaded_at: datetime
     decided_at: datetime | None = None
     decision_note: str | None = None
+    storage_path: str | None = None  # private Cloud Storage object for uploaded originals
+    mime_type: str | None = None
 
 
 # ---------------------------------------------------------------- care requests
@@ -278,7 +280,7 @@ class ChangeEvent(BaseModel):
     source: Literal["sms", "manual", "system"]
     received_at: datetime
     parsed: ParsedEvent | None = None
-    parse_source: Literal["gemini", "manual"] = "gemini"
+    parse_source: Literal["gemini", "manual", "rule"] = "gemini"
     status: Literal["needs_review", "open", "no_feasible_option", "resolved", "rejected", "no_impact"] = "open"
     review_reason: str | None = None
     affected_shift_ids: list[str] = Field(default_factory=list)
@@ -291,6 +293,7 @@ class ChangeEvent(BaseModel):
     excluded: list[dict] = Field(default_factory=list)  # caregivers ruled out, with the rule that did it
     explanation: OptionExplanation | None = None
     decision: Decision | None = None
+    handover_notes: dict[str, str] = Field(default_factory=dict)  # caregiver_id -> note for the incoming caregiver
 
 
 class AuditEntry(BaseModel):

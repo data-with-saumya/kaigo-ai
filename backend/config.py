@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     max_upload_mb: int = 8
     travel_backend: str = "straight_line"  # straight_line | google_maps (Routes API)
+    documents_bucket: str | None = None    # private bucket for uploaded credential documents
+    job_audience: str | None = None        # Cloud Scheduler OIDC audience (this service's URL)
+    scheduler_service_account: str | None = None
+    expiry_horizon_days: int = 14
 
 
 @lru_cache

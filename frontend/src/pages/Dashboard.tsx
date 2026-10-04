@@ -11,6 +11,7 @@ export function DashboardPage() {
   const { dashboard: d, dashboardError, aiAvailable, health } = useWorkspace();
   const navigate = useNavigate();
   const reset = useAction(api.reset);
+  const checks = useAction(api.runChecks);
 
   if (!d) return (
     <Page eyebrow="Operations" title="Today’s care picture">
@@ -42,6 +43,14 @@ export function DashboardPage() {
           <Link className="btn gold" to={`/continuity/${first.event_id}`}>Review options<IconArrow size={16} /></Link>
         </section>
       )}
+      {!first && k.at_risk_shifts > 0 && (
+        <Notice tone="review">
+          <strong>{k.at_risk_shifts} upcoming shift{k.at_risk_shifts > 1 ? "s are" : " is"} at risk</strong>: a caregiver’s registration lapses before the shift ends (rule E-02).{" "}
+          <button className="link-btn" disabled={checks.busy} onClick={async () => {
+            const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
+          }}>Plan replacements now</button>
+        </Notice>
+      )}
       {more.length > 0 && (
         <Notice tone="review">{more.length} more change{more.length > 1 ? "s" : ""} waiting. <Link to="/continuity">See all</Link></Notice>
       )}
@@ -57,7 +66,8 @@ export function DashboardPage() {
         <div className="card kpi"><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
           <span className="small muted">{k.requests_needing_confirmation} need confirmation</span></div>
         <div className="card kpi"><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
-          <span className="small muted">{k.continuity_alerts ? "Awaiting your decision" : "Nothing waiting"}</span></div>
+          <span className="small" style={{ color: k.at_risk_shifts ? "var(--review)" : "var(--muted)", fontWeight: k.at_risk_shifts ? 600 : 400 }}>
+            {k.at_risk_shifts ? `${k.at_risk_shifts} upcoming shift${k.at_risk_shifts > 1 ? "s" : ""} at risk` : k.continuity_alerts ? "Awaiting your decision" : "Nothing waiting"}</span></div>
       </section>
 
       <div className="row">
@@ -67,7 +77,7 @@ export function DashboardPage() {
               <thead><tr><th>When</th><th>Client</th><th>Care</th><th>Caregiver</th><th>Status</th></tr></thead>
               <tbody>
                 {d.upcoming_shifts.map((s) => (
-                  <tr key={s.id} className={s.status === "covered" ? "" : "flag"}>
+                  <tr key={s.id} className={s.status === "covered" && !s.risk ? "" : "flag"}>
                     <td style={{ whiteSpace: "nowrap" }}><span className="num" style={{ fontSize: 17 }}>{relativeDay(s.start)} {span(s.start, s.end)}</span></td>
                     <td>{s.client_name}</td>
                     <td className="muted">{vertical(s.vertical)}</td>
@@ -75,8 +85,11 @@ export function DashboardPage() {
                       <span key={i} style={{ display: "block" }}>
                         {seg.caregiver_name ?? <span style={{ color: "var(--risk)", fontWeight: 600 }}>Uncovered</span>}
                         {s.segments.length > 1 && <span className="muted small"> {span(seg.start, seg.end)}</span>}
-                      </span>))}</td>
-                    <td>{s.status === "covered"
+                      </span>))}
+                      {s.risk && <span className="small" style={{ display: "block", color: "var(--review)" }}>{s.risk}</span>}</td>
+                    <td>{s.risk
+                      ? <span className="chip review" title={s.risk}>At risk</span>
+                      : s.status === "covered"
                       ? <span className="chip ok">Covered</span>
                       : <Link to="/continuity" className="chip risk" style={{ textDecoration: "none" }}>{s.status === "partial" ? "Partly covered" : "Uncovered"}</Link>}</td>
                   </tr>
@@ -118,9 +131,13 @@ export function DashboardPage() {
         <div className="inline">
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("fresh")) navigate("/verify"); }}>Start from the beginning</button>
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("after_assignment")) navigate("/continuity"); }}>Jump to: cancellation</button>
-          {reset.busy && <Spinner label="Resetting…" />}
+          <button className="btn small" disabled={checks.busy} onClick={async () => {
+            const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
+          }}>Run proactive checks now</button>
+          {(reset.busy || checks.busy) && <Spinner label="Working…" />}
         </div>
-        <ErrorNotice error={reset.error} />
+        <p className="small muted">Proactive checks also run every night on Google Cloud Scheduler. They catch registrations that will lapse before an upcoming shift ends.</p>
+        <ErrorNotice error={reset.error ?? checks.error} />
       </Card>
     </Page>
   );

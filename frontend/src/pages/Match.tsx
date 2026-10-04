@@ -87,7 +87,7 @@ export function MatchPage() {
               ))}
             </Card>
             <Card title="How the score works" className="grow-1 linen">
-              <p className="small" style={{ color: "var(--ink-2)" }}>Seven operational factors with fixed maximums, set per care type. It compares staffing options. <strong>It is not a medical or clinical score.</strong></p>
+              <p className="small" style={{ color: "var(--ink-2)" }}>Seven operational factors with fixed maximums, set per care type. Location uses real driving time from Google Maps. It compares staffing options. <strong>It is not a medical or clinical score.</strong></p>
               <div className="stack-sm small">
                 <span><span className="dot trust" /> Trust: qualification</span>
                 <span><span className="dot fit" /> Fit: skills, coverage, location</span>
@@ -112,7 +112,8 @@ function CandidateCard({ c, rank, explanation, onAssign, disabled }: {
             <span className="avatar">{initials(c.name)}</span>
             <div className="stack-sm" style={{ gap: 0 }}>
               <h2 id={`cand-${c.caregiver_id}`} style={{ fontSize: 18, fontWeight: 600 }}>{rank}. {c.name}</h2>
-              <span className="small muted">{c.credential_type} · {c.years_experience} yrs · {c.distance_km} km away ({c.area})</span>
+              <span className="small muted">{c.credential_type} · {c.years_experience} yrs · {c.travel_minutes != null
+                ? `${Math.round(c.travel_minutes)} min by road (${c.distance_km} km)` : `${c.distance_km} km away`} · {c.area}</span>
             </div>
           </div>
           <div className="inline">
