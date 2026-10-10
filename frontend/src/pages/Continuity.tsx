@@ -331,7 +331,7 @@ export function ReplanPage() {
                 <div className="stack">
                   <Notice tone="ok"><strong>Care state updated at {time(event.decision.at)}.</strong> {affected ? `${day(affected.start)} is covered: ${affected.segments.map((s) => `${s.caregiver_name ?? "uncovered"} ${span(s.start, s.end)}`).join(", ")}.` : ""}</Notice>
                   <span className="small muted">Saved as assignment {event.assignment_id}, version {(event.assignment_version ?? 1) + 1}. Decision written to the audit trail.</span>
-                  <Link className="btn" to="/">Back to dashboard</Link>
+                  <Link className="btn" to="/app">Back to Today</Link>
                 </div>
               ) : (
                 <Notice tone="info">All options rejected{event.decision?.note ? ` (${event.decision.note})` : ""}. The shift stays flagged as uncovered on the dashboard until it is filled.</Notice>

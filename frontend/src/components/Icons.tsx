@@ -34,11 +34,10 @@ export const IconBook = (p: P) => <Svg {...p}><path d="M4 5a2 2 0 0 1 2-2h13v16H
 export function Logo({ size = 38 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
-      <circle cx="50" cy="50" r="47" fill="#F4ECE0" stroke="#B8925A" strokeWidth="2.5" />
-      <ellipse cx="50" cy="37" rx="18.5" ry="22" fill="#CFAE7A" />
-      <ellipse cx="39" cy="57" rx="21.5" ry="18" transform="rotate(-22 39 57)" fill="#8F7A60" fillOpacity="0.78" />
-      <ellipse cx="61" cy="57" rx="21.5" ry="18" transform="rotate(22 61 57)" fill="#B48A84" fillOpacity="0.72" />
-      <text x="50" y="58" textAnchor="middle" fontFamily="Georgia, serif" fontStyle="italic" fontWeight="700" fontSize="24" fill="#3D2E10">K</text>
+      <circle cx="50" cy="50" r="47" fill="#FFFFFF" stroke="#C9C4BA" strokeWidth="2.5" />
+      <ellipse cx="50" cy="37" rx="18.5" ry="22" fill="#C29A55" fillOpacity="0.88" />
+      <ellipse cx="39" cy="57" rx="21.5" ry="18" transform="rotate(-22 39 57)" fill="#8F7A60" fillOpacity="0.85" />
+      <ellipse cx="61" cy="57" rx="21.5" ry="18" transform="rotate(22 61 57)" fill="#B48A84" fillOpacity="0.8" />
     </svg>
   );
 }

@@ -42,7 +42,7 @@ export function MatchPage() {
       {(assigned || alreadyAssigned) && (
         <Notice tone="ok">
           <strong>{assigned ?? "This request is assigned."}</strong> Saved and logged to the audit trail.{" "}
-          <Link to="/">Back to dashboard</Link> · <Link to="/continuity">What if someone cancels?</Link>
+          <Link to="/app">Back to Today</Link> · <Link to="/continuity">What if someone cancels?</Link>
         </Notice>
       )}
       <ErrorNotice error={assign.error} />

@@ -127,11 +127,11 @@ export function DashboardPage() {
       </Card>
 
       <Card title="Demo controls" className="linen" actions={<span className="small muted">Your own synthetic agency. Nobody else sees your changes.</span>}>
-        <p className="small">Start the story from the beginning, or jump straight to “Anjali is assigned for five nights” to try the cancellation and replanning flow. Open Anjali’s caregiver app in a second window and message the agency as she would.</p>
+        <p className="small">New here? <Link to="/tour/1?setup=1">Take the guided tour</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
         <div className="inline">
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("fresh")) navigate("/verify"); }}>Start from the beginning</button>
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("after_assignment")) navigate("/continuity"); }}>Jump to: cancellation</button>
-          <Link className="btn secondary small" to="/caregiver/CG-0101" target="_blank" rel="noreferrer">Open Anjali’s caregiver app</Link>
+          <Link className="btn secondary small" to="/caregiver/CG-0101">Open Anjali’s caregiver app</Link>
           <button className="btn small" disabled={checks.busy} onClick={async () => {
             const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
           }}>Run proactive checks now</button>
