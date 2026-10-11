@@ -12,16 +12,19 @@ export interface Chapter {
   roles: { who: string; what: string; style: "ai" | "rule" | "human" }[];
   links: { label: string; to: string; primary?: boolean }[];
   tourStep: number;
+  /** The website's three columns: a short headline, one sentence, one link. */
+  site: { title: string; text: string; link: { label: string; to: string } };
 }
 
-export const PETAL_COLOUR: Record<Petal, string> = { trust: "#8F7A60", fit: "#C29A55", continuity: "#B48A84" };
-export const PETAL_INK: Record<Petal, string> = { trust: "#6E5C46", fit: "#7A5F2E", continuity: "#8E5F58" };
+// Brand v1 (12 Oct 2026): Trust = teal, Fit = sunshine, Continuity = tangerine. The "ink" shades are for text.
+export const PETAL_COLOUR: Record<Petal, string> = { trust: "#0FA3A3", fit: "#FFC93C", continuity: "#FF7A2F" };
+export const PETAL_INK: Record<Petal, string> = { trust: "#0B7C7C", fit: "#7A5600", continuity: "#B8460F" };
 
 export const HERO = {
-  eyebrow: "Care operations for home-care agencies",
-  title: "Keep care running when the night",
-  emphasis: "changes.",
-  body: "Kaigo verifies caregivers, matches them to each client’s needs, and replans in minutes when someone cancels. A coordinator approves every change.",
+  eyebrow: "For home-care agencies in India",
+  title: "A nurse cancels at 21:32.",
+  emphasis: "Care carries on.",
+  body: "Kaigo checks caregivers’ papers, matches them to clients and replans the moment someone drops out. A person approves every change.",
 };
 
 export const PROBLEM = {
@@ -41,6 +44,7 @@ export const CHAPTERS: Chapter[] = [
     ],
     links: [{ label: "Open Verification", to: "/verify", primary: true }],
     tourStep: 1,
+    site: { title: "Papers, checked.", text: "Gemini reads each registration certificate. Seven plain rules decide what’s valid, and anything unclear goes to a person.", link: { label: "See verification", to: "/verify" } },
   },
   {
     id: "fit", number: "02", name: "Fit", title: "Turn a request into the right match.",
@@ -55,6 +59,7 @@ export const CHAPTERS: Chapter[] = [
       { label: "Open Matching", to: "/requests" },
     ],
     tourStep: 2,
+    site: { title: "The right person, nearby.", text: "Describe the need in your own words. Kaigo ranks who fits, with real driving times and the reasons shown.", link: { label: "See matching", to: "/requests" } },
   },
   {
     id: "continuity", number: "03", name: "Continuity", title: "When the night changes, replan in minutes.",
@@ -70,6 +75,7 @@ export const CHAPTERS: Chapter[] = [
       { label: "Open Messages", to: "/messages" },
     ],
     tourStep: 4,
+    site: { title: "Cover, before the panic.", text: "When someone cancels, Kaigo drafts cover options and a handover note.", link: { label: "See replanning", to: "/continuity" } },
   },
 ];
 

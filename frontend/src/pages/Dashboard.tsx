@@ -1,5 +1,7 @@
+import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuditList } from "../components/AuditList";
+import { Pen } from "../components/Brand";
 import { IconArrow, IconLoop } from "../components/Icons";
 import { Page, useWorkspace } from "../components/Shell";
 import { Card, ErrorNotice, Notice, Spinner, VerificationChip } from "../components/ui";
@@ -20,9 +22,21 @@ export function DashboardPage() {
   );
   const k = d.kpis;
   const [first, ...more] = d.alerts;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
+  const waiting = k.continuity_alerts;
+  const title = (
+    <>
+      {greeting}{" "}
+      {waiting
+        ? <span className="pen-wrap" style={{ color: "var(--continuity-ink)" }}>{waiting} change{waiting > 1 ? "s need" : " needs"} you.<Pen stroke="underline" className="under" width={2.2} delay={300} /></span>
+        : k.uncovered_upcoming ? `${k.uncovered_upcoming} shift${k.uncovered_upcoming > 1 ? "s" : ""} not fully covered.` : "Every shift is covered."}
+    </>
+  );
+  const accent = (c: string) => ({ "--accent": c } as CSSProperties);
 
   return (
-    <Page eyebrow={longDay(d.now)} title="Today’s care picture">
+    <Page eyebrow={`Today · ${longDay(d.now)}`} title={title}>
       {health && !aiAvailable && (
         <Notice tone="review">
           <strong>Gemini is unavailable right now.</strong> Records, schedules, rule checks, matching and replanning still
@@ -56,16 +70,16 @@ export function DashboardPage() {
       )}
 
       <section aria-label="Today at a glance" className="grid-auto">
-        <div className="card kpi"><span className="label">Active assignments</span><span className="value">{k.active_assignments}</span>
+        <div className="card kpi" style={accent("var(--plum)")}><span className="label">Active assignments</span><span className="value">{k.active_assignments}</span>
           <span className="small muted">{Object.entries(k.assignments_by_vertical).map(([v, n]) => `${vertical(v)} ${n}`).join(" · ")}</span></div>
-        <div className="card kpi"><span className="label">Shifts in next 24 h</span><span className="value">{k.shifts_next_24h}</span>
+        <div className="card kpi" style={accent("var(--plum)")}><span className="label">Shifts in next 24 h</span><span className="value">{k.shifts_next_24h}</span>
           <span className="small" style={{ color: k.uncovered_upcoming ? "var(--risk)" : "var(--muted)", fontWeight: k.uncovered_upcoming ? 600 : 400 }}>
             {k.uncovered_upcoming ? `${k.uncovered_upcoming} upcoming not fully covered` : "All upcoming shifts covered"}</span></div>
-        <div className="card kpi"><span className="label"><span className="dot trust" />Pending verifications</span><span className="value">{k.pending_verifications}</span>
+        <div className="card kpi" style={accent("var(--trust)")}><span className="label"><span className="dot trust" />Pending verifications</span><span className="value">{k.pending_verifications}</span>
           <span className="small muted">{k.blocked_credentials} blocked by rules</span></div>
-        <div className="card kpi"><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
+        <div className="card kpi" style={accent("var(--fit)")}><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
           <span className="small muted">{k.requests_needing_confirmation} need confirmation</span></div>
-        <div className="card kpi"><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
+        <div className="card kpi" style={accent("var(--continuity)")}><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
           <span className="small" style={{ color: k.at_risk_shifts ? "var(--review)" : "var(--muted)", fontWeight: k.at_risk_shifts ? 600 : 400 }}>
             {k.at_risk_shifts ? `${k.at_risk_shifts} upcoming shift${k.at_risk_shifts > 1 ? "s" : ""} at risk` : k.continuity_alerts ? "Awaiting your decision" : "Nothing waiting"}</span></div>
       </section>
@@ -127,12 +141,12 @@ export function DashboardPage() {
       </Card>
 
       <Card title="Demo controls" className="linen" actions={<span className="small muted">Your own synthetic agency. Nobody else sees your changes.</span>}>
-        <p className="small">New here? <Link to="/tour/1?setup=1">Take the guided tour</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
+        <p className="small">New here? <Link to="/learn">Learn Kaigo in six steps</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
         <div className="inline">
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("fresh")) navigate("/verify"); }}>Start from the beginning</button>
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("after_assignment")) navigate("/continuity"); }}>Jump to: cancellation</button>
           <Link className="btn secondary small" to="/caregiver/CG-0101">Open Anjali’s caregiver app</Link>
-          <button className="btn small" disabled={checks.busy} onClick={async () => {
+          <button className="btn primary small" disabled={checks.busy} onClick={async () => {
             const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
           }}>Run proactive checks now</button>
           {(reset.busy || checks.busy) && <Spinner label="Working…" />}

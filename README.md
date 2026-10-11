@@ -6,13 +6,33 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 | | |
 |---|---|
-| Live prototype (v2, this branch) | https://kaigoai-v2.web.app |
+| Live prototype (v4, this branch: new brand) | https://kaigoai-v4.web.app |
+| Live prototype (v3, branch `v3`) | https://kaigoai-v3.web.app |
+| Live prototype (v2, branch `v2`) | https://kaigoai-v2.web.app |
 | Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
 | Source code | https://github.com/data-with-saumya/kaigo-ai |
 | Demo video (under 3 min) | _[link]_ |
 | Pitch deck (PDF) | _[link]_ |
 
 ---
+
+## What's new in v4
+
+v4 gives Kaigo its brand and a simpler app. It runs on the same engine as v2 and v3 (Cloud Run `kaigo-api-v2`); only the frontend changed.
+
+- **Brand:** logo A ("Continuum": a ring with a gap, and the dot that closes it) in the sunrise colours. Trust is teal, Fit is sunshine and Continuity is tangerine, on notebook paper. Pen notes are in Caveat.
+- **Website:** a single calm page. Lined paper, a few handwritten notes in the margin, one coloured button.
+- **App:** one row of tabs (Today, Trust, Fit, Continuity, Messages, Learn). The breadcrumbs, step rail and previous/next footer are gone.
+- **Learn tab:** the six-step tutorial, which you can open at any time. A sticky note shows what to do on each screen.
+- **Motion:**
+  - smooth scrolling (Lenis) and page transitions (View Transitions);
+  - buttons that press like stickers, and sections that fade in as you scroll;
+  - pen strokes that draw themselves in;
+  - a sketched-logo "thinking" state instead of a spinner.
+
+  All motion stops when animation is turned off in the system settings.
+
+v4 runs as Hosting site `kaigoai-v4`.
 
 ## What's new in v2
 
@@ -132,7 +152,7 @@ Results: [docs/evaluation.md](docs/evaluation.md).
 
 ## Try it
 
-On the dashboard, **Demo controls** gives you two ways in:
+Open **Learn** in the app (v4) and start any of the six steps; each one sets up the demo agency and opens the right screen. Or, on the dashboard, **Demo controls** gives you two ways in:
 - **Start from the beginning:** verify Priya, create Mrs Sharma's request, match, assign.
 - **Jump to: cancellation:** go straight to the continuity flow.
 

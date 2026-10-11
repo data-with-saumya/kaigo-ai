@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChatThread, Composer } from "../components/ChatThread";
-import { Logo } from "../components/Icons";
+import { Logo } from "../components/Brand";
 import { ErrorNotice, Notice, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { relativeDay, span } from "../lib/format";
@@ -27,7 +27,7 @@ export function CaregiverAppPage() {
     <div className="phone">
       <header className="phone-head">
         <div className="spread" style={{ flexWrap: "nowrap" }}>
-          <span className="inline" style={{ gap: 8 }}><Logo size={30} /><strong style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--gold-ink)" }}>Kaigo</strong></span>
+          <Logo height={22} tone="dark" />
           <span className="tag rule">Caregiver app · demo view</span>
         </div>
         <div>

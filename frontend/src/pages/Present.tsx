@@ -1,14 +1,14 @@
 import { useCallback, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CHAPTERS, HERO, PETAL_COLOUR, PROBLEM, PROOF, PROOF_NOTE, STACK } from "../lib/story";
-import { PetalMark } from "./Landing";
+import { Logo, Pen } from "../components/Brand";
 import "./present.css";
 
 const SLIDES = [
-  { key: "cover", title: "21:32", sub: "A nurse cancels", accent: "#1C1B19" },
+  { key: "cover", title: "21:32", sub: "A nurse cancels", accent: "#2A1838" },
   ...CHAPTERS.map((c) => ({ key: c.id, title: c.name, sub: c.title, accent: PETAL_COLOUR[c.id] })),
-  { key: "proof", title: "Proof", sub: "Measured, not claimed", accent: "#1C1B19" },
-  { key: "start", title: "Start", sub: "Try it live", accent: "#1C1B19" },
+  { key: "proof", title: "Proof", sub: "Measured, not claimed", accent: "#2A1838" },
+  { key: "start", title: "Start", sub: "Try it live", accent: "#2A1838" },
 ];
 
 export function PresentPage() {
@@ -36,16 +36,16 @@ export function PresentPage() {
   const chapter = CHAPTERS.find((c) => c.id === slide.key);
 
   return (
-    <div className={`present ${dark ? "dark" : ""}`}>
+    <div className={`present ${dark ? "dark paper-night" : "paper-lined"}`}>
       <header className="p-top">
-        <button type="button" className="p-brand" onClick={() => go(0)} aria-label="First slide"><PetalMark size={30} light={dark} /><span>Kaigo</span></button>
+        <button type="button" className="p-brand" onClick={() => go(0)} aria-label="Kaigo, first slide"><Logo height={28} tone={dark ? "dark" : "light"} /></button>
         <span className="p-label">{overview ? "All slides" : `${String(i + 1).padStart(2, "0")} / ${String(SLIDES.length).padStart(2, "0")} · ${slide.title}`}</span>
         <div className="p-actions">
           <button type="button" className="p-btn" onClick={toggleOverview} aria-pressed={overview}>▦ Overview <kbd>O</kbd></button>
           <Link to="/" className="p-btn">Exit <kbd>Esc</kbd></Link>
         </div>
       </header>
-      <div className="p-progress" aria-hidden="true"><span style={{ width: `${((i + 1) / SLIDES.length) * 100}%`, background: dark ? "#F6F5F2" : slide.accent }} /></div>
+      <div className="p-progress" aria-hidden="true"><span style={{ width: `${((i + 1) / SLIDES.length) * 100}%`, background: dark ? "#FFC93C" : slide.accent }} /></div>
 
       {overview ? (
         <div className="p-overview">
@@ -62,8 +62,8 @@ export function PresentPage() {
         <main className="p-stage" aria-live="polite">
           {slide.key === "cover" && (
             <section className="p-cover">
-              <span className="p-huge">{PROBLEM.time}.</span>
-              <h1>{PROBLEM.text.replace("Most staffing tools ask who is free.", "")}<em>{" "}Kaigo keeps the care running.</em></h1>
+              <span className="p-huge"><span className="pen-wrap">{PROBLEM.time}<Pen stroke="circle" className="ring" width={2.4} delay={500} /></span>.</span>
+              <h1>{PROBLEM.text.replace("Most staffing tools ask who is free.", "")}<span className="highlight">{" "}{HERO.emphasis}</span></h1>
               <p className="p-lead">{HERO.body}</p>
               <div className="p-ctas"><button type="button" className="p-cta solid" onClick={() => go(1)}>Start →</button><Link to="/tour/1?setup=1" className="p-cta">Skip to the guided tour</Link></div>
             </section>
@@ -86,7 +86,7 @@ export function PresentPage() {
           )}
           {slide.key === "proof" && (
             <section className="p-proof">
-              <h2>Measured, not claimed.</h2>
+              <h2><span className="pen-wrap">Measured<Pen stroke="underline" className="under" width={2.2} delay={300} /></span>, not claimed.</h2>
               <div className="p-proof-grid">{PROOF.map((p) => <div key={p.value}><span>{p.value}</span>{p.label}</div>)}</div>
               <p className="p-note">{PROOF_NOTE}</p>
               <div className="p-stack">{STACK.map((s) => <span key={s}>{s}</span>)}</div>
@@ -110,7 +110,7 @@ export function PresentPage() {
         <div className="p-dots" role="group" aria-label="Slides">
           {SLIDES.map((s, n) => (
             <button key={s.key} type="button" onClick={() => go(n)} aria-label={`Slide ${n + 1}: ${s.title}`} aria-current={n === i ? "step" : undefined}
-              style={{ width: n === i ? 36 : 12, background: n === i ? (dark ? "#F6F5F2" : s.accent) : dark ? "#3a3833" : "#C9C4BA" }} />
+              style={{ width: n === i ? 36 : 12, background: n === i ? (dark ? "#FFC93C" : s.accent) : dark ? "#4a3b55" : "#DCCBB3" }} />
           ))}
         </div>
         <button type="button" className="p-nav solid" onClick={() => go(i + 1)} disabled={i === SLIDES.length - 1} aria-label="Next slide">{i < SLIDES.length - 1 ? SLIDES[i + 1].title : "End"} →</button>

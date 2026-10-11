@@ -126,7 +126,7 @@ export function ReplanPage() {
   const [decideError, setDecideError] = useState<unknown>(null);
   const names = useMemo(() => Object.fromEntries((caregivers.data ?? []).map((c) => [c.id, c.name])), [caregivers.data]);
   const colours = useMemo(() => {
-    const palette = ["#d9be8c", "#d4b3ad", "#c9b9a3", "#e2cfa6"];
+    const palette = ["#ffd98a", "#a8e0dc", "#ffc2a0", "#ddd0ea"];
     const ids = Array.from(new Set((event?.options ?? []).flatMap((o) => o.caregiver_ids)));
     return Object.fromEntries(ids.map((cid, i) => [cid, palette[i % palette.length]]));
   }, [event?.options]);
@@ -155,7 +155,7 @@ export function ReplanPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event?.id, event?.status, aiAvailable]);
 
-  if (!event) return <Page eyebrow="Continuity" title="Replan"><Spinner label="Loading…" /><ErrorNotice error={live.error} /></Page>;
+  if (!event) return <Page back={{ to: "/continuity", label: "All changes" }} eyebrow="Continuity" title="Replan"><Spinner label="Loading…" /><ErrorNotice error={live.error} /></Page>;
 
   const affected = shifts.find((s) => s.id === event.affected_shift_ids[0]);
   const current = event.options.find((o) => o.id === picked) ?? null;
@@ -188,14 +188,14 @@ export function ReplanPage() {
   };
 
   return (
-    <Page eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
+    <Page back={{ to: "/continuity", label: "All changes" }} eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
       actions={<span className={`chip ${tone}`} style={{ minHeight: 36, padding: "0 14px" }}>{label}</span>}>
       <div className="row stretch">
         <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : event.source === "chat" ? "In-app chat" : event.source === "system" ? "Detected" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>
           {event.source === "chat" && event.parsed?.caregiver_id && (
             <Link to={`/messages?with=${event.parsed.caregiver_id}`} className="small" style={{ fontWeight: 600 }}>Open the conversation →</Link>
           )}
-          {event.raw_text && <blockquote style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "var(--linen)", fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 16 }}>“{event.raw_text}”</blockquote>}
+          {event.raw_text && <blockquote style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "var(--linen)", fontStyle: "italic", fontSize: 17, borderLeft: "4px solid var(--continuity)" }}>“{event.raw_text}”</blockquote>}
           {event.parsed && (
             <>
               <div className="inline">
@@ -280,7 +280,7 @@ export function ReplanPage() {
                       <th scope="row" style={{ border: "none" }}>Total</th>
                       {event.options.map((o) => (
                         <td key={o.id} className="num" style={{ textAlign: "center", fontSize: 24, background: o.id === picked ? "var(--linen)" : undefined }}>
-                          <span style={o.feasible ? undefined : { textDecoration: "line-through", color: "#a0937f" }}>{o.total}</span>
+                          <span style={o.feasible ? undefined : { textDecoration: "line-through", color: "#a99cb0" }}>{o.total}</span>
                           {!o.feasible && <div className="small" style={{ fontFamily: "var(--font-ui)", color: "var(--risk)" }}>not eligible</div>}
                         </td>
                       ))}

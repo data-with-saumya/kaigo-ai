@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { ActorType, Factor, VerificationStatus } from "../lib/types";
+import { Thinking } from "./Brand";
 import { IconAlert, IconCheck, IconInfo, IconPerson, IconRule, IconSpark, IconX } from "./Icons";
 
 /** Who produced a value: Gemini (dashed), a deterministic rule (solid) or a person (filled). */
@@ -52,8 +53,9 @@ export function FactorBars({ factors }: { factors: Factor[] }) {
   );
 }
 
+/** Waiting on Gemini or the server: the logo sketches itself. */
 export function Spinner({ label }: { label: string }) {
-  return <span className="inline muted small"><span className="spinner" aria-hidden="true" />{label}</span>;
+  return <Thinking label={label} />;
 }
 
 export function ErrorNotice({ error }: { error: unknown }) {

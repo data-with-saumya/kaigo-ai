@@ -24,7 +24,7 @@ export function MatchPage() {
   const alreadyAssigned = request.data?.status === "assigned";
 
   return (
-    <Page eyebrow={`Fit · Matching for ${id}`} title={client ? `Caregiver options for ${client.name}` : "Caregiver options"}>
+    <Page back={{ to: `/requests/${id}`, label: "Requirements" }} eyebrow={`Fit · Matching for ${id}`} title={client ? `Caregiver options for ${client.name}` : "Caregiver options"}>
       {r && (
         <section aria-label="Requirements" className="card linen" style={{ padding: "14px 18px", flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
           <span className="small" style={{ fontWeight: 600, color: "var(--ink-2)" }}>Matching on</span>
