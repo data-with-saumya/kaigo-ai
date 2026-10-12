@@ -70,8 +70,16 @@ export function RequestEditorPage() {
   });
   const [manual, setManual] = useState<Requirements | null>(null);
 
+  if (id && !request && load.error) {
+    return (
+      <Page back={{ to: "/requests", label: "Care requests" }} eyebrow="Fit · Care request" title="Care request not found">
+        <Notice tone="info">This request isn’t in your demo agency any more; the demo may have been reset. <Link to="/requests">See all care requests</Link> or <Link to="/requests/new">start a new one</Link>.</Notice>
+      </Page>
+    );
+  }
+
   return (
-    <Page note="check the dates." back={{ to: "/requests", label: "Care requests" }} eyebrow={`Fit · ${request ? `Care request ${request.id}` : "New care request"}`} title={request ? `Requirements for ${client?.name ?? "client"}` : "New care request"}>
+    <Page note="check the dates." back={{ to: "/requests", label: "Care requests" }} eyebrow={`Fit · ${request ? `Care request ${request.id}` : "New care request"}`} title={request ? `Requirements for ${client?.name ?? "client"}` : id ? "Care request" : "New care request"}>
       <div className="row">
         <Card title="Describe the need" className="grow-1" labelledBy="need">
           <div className="field">

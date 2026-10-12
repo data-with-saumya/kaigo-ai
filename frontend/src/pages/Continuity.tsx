@@ -155,7 +155,16 @@ export function ReplanPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event?.id, event?.status, aiAvailable]);
 
-  if (!event) return <Page back={{ to: "/continuity", label: "All changes" }} eyebrow="Continuity" title="Replan"><Spinner label="Loading…" /><ErrorNotice error={live.error} /></Page>;
+  if (!event) {
+    const gone = live.error instanceof ApiError && live.error.status === 404;
+    return (
+      <Page back={{ to: "/continuity", label: "All changes" }} eyebrow="Continuity" title={gone ? "Change not found" : "Replan"}>
+        {gone
+          ? <Notice tone="info">This change isn’t in your demo agency any more; the demo may have been reset. <Link to="/continuity">See all changes</Link>.</Notice>
+          : <><Spinner label="Loading…" /><ErrorNotice error={live.error} /></>}
+      </Page>
+    );
+  }
 
   const affected = shifts.find((s) => s.id === event.affected_shift_ids[0]);
   const current = event.options.find((o) => o.id === picked) ?? null;

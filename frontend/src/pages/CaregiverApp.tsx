@@ -32,7 +32,7 @@ export function CaregiverAppPage() {
         </div>
         <div>
           <div className="eyebrow">Signed in as</div>
-          <strong style={{ fontSize: 18 }}>{me?.name ?? "…"}</strong>
+          <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{me?.name ?? "…"}</h1>
         </div>
         <p className="small muted">In the real app caregivers sign in on their phone with a one-time code. <Link to="/messages">Back to coordinator view</Link></p>
       </header>

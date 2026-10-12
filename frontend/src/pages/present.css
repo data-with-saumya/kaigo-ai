@@ -35,7 +35,7 @@ kbd { font-family: inherit; font-size: 11px; padding: 1px 6px; border-radius: 6p
 .p-text { flex: 1 1 520px; display: flex; flex-direction: column; gap: 22px; }
 .p-tag { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 0.04em; }
 .p-tag span { width: 14px; height: 14px; border-radius: 50%; }
-.p-chapter h2, .p-proof h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 5.6vw, 76px); line-height: 1; letter-spacing: -0.04em; }
+.p-chapter h1, .p-proof h1, .p-chapter h2, .p-proof h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 5.6vw, 76px); line-height: 1; letter-spacing: -0.04em; }
 .p-roles { flex: 1 1 380px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .p-roles li { display: flex; align-items: center; gap: 12px; padding: 20px 22px; border-radius: 12px; font-size: 18px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 .p-roles li span { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--panel); font-weight: 800; font-size: 14px; flex: none; }

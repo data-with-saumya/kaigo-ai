@@ -72,7 +72,7 @@ export function PresentPage() {
             <section className="p-chapter">
               <div className="p-text">
                 <span className="p-tag"><span style={{ background: PETAL_COLOUR[chapter.id] }} />{chapter.number} · {chapter.name}</span>
-                <h2>{chapter.title}</h2>
+                <h1>{chapter.title}</h1>
                 <p className="p-lead">{chapter.body}</p>
                 <div className="p-ctas">
                   <Link to={`/tour/${chapter.tourStep}?setup=1`} className="p-cta solid">Try it live →</Link>
@@ -86,7 +86,7 @@ export function PresentPage() {
           )}
           {slide.key === "proof" && (
             <section className="p-proof">
-              <h2><span className="pen-wrap">Measured<Pen stroke="underline" className="under" width={2.2} delay={300} /></span>, not claimed.</h2>
+              <h1><span className="pen-wrap">Measured<Pen stroke="underline" className="under" width={2.2} delay={300} /></span>, not claimed.</h1>
               <div className="p-proof-grid">{PROOF.map((p) => <div key={p.value}><span>{p.value}</span>{p.label}</div>)}</div>
               <p className="p-note">{PROOF_NOTE}</p>
               <div className="p-stack">{STACK.map((s) => <span key={s}>{s}</span>)}</div>
