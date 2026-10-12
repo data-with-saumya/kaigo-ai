@@ -78,7 +78,7 @@ export function ContinuityPage() {
       </div>
 
       <Card title="Proactive checks" className="linen" actions={<span className="chip rule">Rule E-02 · Cloud Scheduler, nightly</span>}>
-        <p className="small" style={{ color: "var(--ink-2)" }}>Kaigo doesn’t wait for a cancellation. Every night it checks upcoming shifts for caregivers whose registration lapses before the shift ends, and opens a replanning event early.</p>
+        <p className="small" style={{ color: "var(--ink-2)" }}>KaigoAI doesn’t wait for a cancellation. Every night it checks upcoming shifts for caregivers whose registration lapses before the shift ends, and opens a replanning event early.</p>
         <div className="inline">
           <button className="btn secondary small" disabled={checks.busy} onClick={async () => {
             const r = await checks.run();

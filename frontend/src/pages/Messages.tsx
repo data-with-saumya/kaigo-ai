@@ -35,7 +35,7 @@ export function MessagesPage() {
                 <span className="stack-sm" style={{ gap: 0, flex: 1, minWidth: 0 }}>
                   <strong style={{ fontSize: 14 }}>{t.name}</strong>
                   <span className="small muted" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {t.last ? `${t.last.sender === "coordinator" ? "You: " : t.last.sender === "kaigo" ? "Kaigo: " : ""}${t.last.text}` : t.area}
+                    {t.last ? `${t.last.sender === "coordinator" ? "You: " : t.last.sender === "kaigo" ? "KaigoAI: " : ""}${t.last.text}` : t.area}
                   </span>
                 </span>
                 <span className="stack-sm" style={{ alignItems: "flex-end", gap: 2 }}>

@@ -1,4 +1,4 @@
-"""Measure Kaigo's Gemini-powered steps against fixed ground truth.
+"""Measure KaigoAI's Gemini-powered steps against fixed ground truth.
 
   backend/.venv/bin/python scripts/evaluate.py [--runs 1]
 
@@ -247,7 +247,7 @@ def main() -> None:
     (out / "report.json").write_text(json.dumps(report, indent=2, default=str))
     pct = lambda v: "n/a" if v is None else f"{v * 100:.0f}%"  # noqa: E731
     lines = [
-        f"# Kaigo evaluation: {report['run_at'][:16]} · model {report['model']}", "",
+        f"# KaigoAI evaluation: {report['run_at'][:16]} · model {report['model']}", "",
         "| Metric | Result |", "|---|---|",
         f"| Credential field extraction accuracy | {pct(report['credentials']['field_accuracy'])} ({report['credentials']['fields_scored']} fields) |",
         f"| Verification outcome accuracy | {pct(report['credentials']['verification_status_accuracy'])} |",

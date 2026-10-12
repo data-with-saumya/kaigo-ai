@@ -1,6 +1,6 @@
 # Setup and deployment
 
-Kaigo runs entirely on Google Cloud:
+KaigoAI runs entirely on Google Cloud:
 - **Firebase Hosting** serves the coordinator UI
 - **Firebase Authentication** gives every visitor an isolated demo workspace
 - **Cloud Run** hosts the FastAPI API
@@ -53,7 +53,7 @@ gcloud firestore databases create --location=$REGION
 Create a least-privilege service account for the API:
 
 ```bash
-gcloud iam service-accounts create kaigo-api --display-name="Kaigo API" && for ROLE in roles/datastore.user roles/aiplatform.user roles/logging.logWriter; do gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:kaigo-api@$PROJECT_ID.iam.gserviceaccount.com" --role=$ROLE; done
+gcloud iam service-accounts create kaigo-api --display-name="KaigoAI API" && for ROLE in roles/datastore.user roles/aiplatform.user roles/logging.logWriter; do gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:kaigo-api@$PROJECT_ID.iam.gserviceaccount.com" --role=$ROLE; done
 ```
 
 No API key is needed: Cloud Run calls Gemini with its service-account identity, so there is no Gemini secret to leak.

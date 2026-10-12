@@ -1,8 +1,8 @@
 """In-app chat between caregivers and the agency (one thread per caregiver).
 
-A caregiver's message is read by Gemini. If it reports a change (cancellation, new hours, urgent cover), Kaigo
+A caregiver's message is read by Gemini. If it reports a change (cancellation, new hours, urgent cover), KaigoAI
 opens a change event exactly as for any other channel, but the sender is known for certain, so nobody has to
-guess who wrote. Kaigo's own replies are fixed templates, not generated text. After a coordinator approves a
+guess who wrote. KaigoAI's own replies are fixed templates, not generated text. After a coordinator approves a
 replacement, the people involved are told in their threads and the handover notes are delivered there.
 """
 

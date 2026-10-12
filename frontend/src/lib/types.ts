@@ -1,4 +1,4 @@
-// Shapes returned by the Kaigo API (see backend/models/domain.py).
+// Shapes returned by the KaigoAI API (see backend/models/domain.py).
 
 export type Vertical = "home_nursing" | "hospice";
 export type ActorType = "ai" | "rule" | "human" | "system";

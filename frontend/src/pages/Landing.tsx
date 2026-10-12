@@ -7,8 +7,8 @@ import "./landing.css";
 export function LandingPage() {
   return (
     <div className="site paper-lined">
-      <nav className="site-nav" aria-label="Kaigo">
-        <Link to="/" className="brand" aria-label="Kaigo, home"><Logo height={30} animate /></Link>
+      <nav className="site-nav" aria-label="KaigoAI">
+        <Link to="/" className="brand" aria-label="KaigoAI, home"><Logo height={30} animate /></Link>
         <div className="site-links">
           <a href="#how">How it works</a>
           <a href="#proof">Proof</a>
@@ -48,11 +48,11 @@ export function LandingPage() {
       <Reveal as="section" className="problem">
         <Pen stroke="bracket" className="bracket" />
         <Note className="margin-note" style={{ top: 40 }} rotate={-5}>every<br />single<br />week.</Note>
-        <p>Every agency knows the call. A caregiver can’t make it, a family is waiting, and the rest of the evening goes on phone calls. <span className="soft">Kaigo turns that evening into one decision.</span></p>
+        <p>Every agency knows the call. A caregiver can’t make it, a family is waiting, and the rest of the evening goes on phone calls. <span className="soft">KaigoAI turns that evening into one decision.</span></p>
       </Reveal>
 
       <section id="how" className="services" aria-labelledby="how-h">
-        <h2 id="how-h" className="eyebrow">Three things Kaigo does</h2>
+        <h2 id="how-h" className="eyebrow">Three things KaigoAI does</h2>
         <div className="svc-grid">
           {CHAPTERS.map((c, i) => (
             <Reveal key={c.id} className="svc" delay={i * 120} style={{ borderTopColor: PETAL_COLOUR[c.id] }}>
@@ -97,11 +97,11 @@ export function LandingPage() {
           <Link to="/tour/1?setup=1" className="btn primary">Take the 2-minute tour</Link>
           <Link to="/app" className="text-link" viewTransition>Open the live demo</Link>
         </div>
-        <Note className="sign">— team Kaigo</Note>
+        <Note className="sign">— team KaigoAI</Note>
       </Reveal>
 
       <footer className="site-foot">
-        <span>Kaigo · built on Google Cloud with Gemini · Google Cloud AI Builder Cup 2026 · synthetic demo data only</span>
+        <span>KaigoAI · built on Google Cloud with Gemini · Google Cloud AI Builder Cup 2026 · synthetic demo data only</span>
         <span className="foot-links">
           <Link to="/present">Present the story</Link>
           <Link to="/learn" viewTransition>Learn in six steps</Link>

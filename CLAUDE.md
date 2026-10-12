@@ -1,4 +1,4 @@
-# Kaigo AI — working rules for Claude Code
+# KaigoAI — working rules for Claude Code
 
 AI operations and Care Continuity Intelligence for home-care agencies. Google Cloud AI Builder Cup 2026 entry
 (theme: Sustainability & Social Impact). Deadline 18 Oct 2026; the app must stay live through evaluation (to 6 Nov+).

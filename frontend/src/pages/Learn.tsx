@@ -9,7 +9,7 @@ const SERVICE = { trust: "Trust", fit: "Fit", continuity: "Continuity" } as cons
 /** The guided tour as a tab you can visit any time: six steps, in any order. */
 export function LearnPage() {
   return (
-    <Page eyebrow="Learn" title="Learn Kaigo in six steps">
+    <Page eyebrow="Learn" title="Learn KaigoAI in six steps">
       <p className="learn-intro">Each step sets up the demo agency and opens the right screen. A sticky note tells you what to do there. Go in order, or jump to any step.</p>
       <ol className="learn-list">
         {TOUR.map((s) => (
@@ -30,7 +30,7 @@ export function LearnPage() {
           </li>
         ))}
       </ol>
-      <p className="small muted">Prefer to watch first? <Link to="/present">Present the story</Link> as slides, or read <Link to="/how-it-works" viewTransition>how Kaigo works</Link> in detail.</p>
+      <p className="small muted">Prefer to watch first? <Link to="/present">Present the story</Link> as slides, or read <Link to="/how-it-works" viewTransition>how KaigoAI works</Link> in detail.</p>
     </Page>
   );
 }

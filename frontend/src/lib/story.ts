@@ -1,4 +1,4 @@
-// The Kaigo story, written once and shown two ways: the long-scroll landing page and Present mode.
+// The KaigoAI story, written once and shown two ways: the long-scroll landing page and Present mode.
 
 export type Petal = "trust" | "fit" | "continuity";
 
@@ -24,13 +24,13 @@ export const HERO = {
   eyebrow: "For home-care agencies in India",
   title: "A nurse cancels at 21:32.",
   emphasis: "Care carries on.",
-  body: "Kaigo checks caregivers’ papers, matches them to clients and replans the moment someone drops out. A person approves every change.",
+  body: "KaigoAI checks caregivers’ papers, matches them to clients and replans the moment someone drops out. A person approves every change.",
 };
 
 export const PROBLEM = {
   time: "21:32",
   text: "A nurse messages that she can’t do tomorrow night. Most staffing tools ask who is free.",
-  turn: "Kaigo asks how to keep this patient’s care continuous.",
+  turn: "KaigoAI asks how to keep this patient’s care continuous.",
 };
 
 export const CHAPTERS: Chapter[] = [
@@ -48,7 +48,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: "fit", number: "02", name: "Fit", title: "Turn a request into the right match.",
-    body: "Describe the need in plain words. Kaigo builds the requirements, asks when something is ambiguous, then ranks every caregiver on seven transparent factors, including real driving time and whether they already know the client.",
+    body: "Describe the need in plain words. KaigoAI builds the requirements, asks when something is ambiguous, then ranks every caregiver on seven transparent factors, including real driving time and whether they already know the client.",
     roles: [
       { who: "Gemini", what: "understands the request", style: "ai" },
       { who: "Rules", what: "decide who is eligible", style: "rule" },
@@ -59,11 +59,11 @@ export const CHAPTERS: Chapter[] = [
       { label: "Open Matching", to: "/requests" },
     ],
     tourStep: 2,
-    site: { title: "The right person, nearby.", text: "Describe the need in your own words. Kaigo ranks who fits, with real driving times and the reasons shown.", link: { label: "See matching", to: "/requests" } },
+    site: { title: "The right person, nearby.", text: "Describe the need in your own words. KaigoAI ranks who fits, with real driving times and the reasons shown.", link: { label: "See matching", to: "/requests" } },
   },
   {
     id: "continuity", number: "03", name: "Continuity", title: "When the night changes, replan in minutes.",
-    body: "A caregiver messages in the app. Kaigo finds the affected shift, rechecks everyone and lays out the trade-offs. You approve, and the new caregivers get their booking and a handover note.",
+    body: "A caregiver messages in the app. KaigoAI finds the affected shift, rechecks everyone and lays out the trade-offs. You approve, and the new caregivers get their booking and a handover note.",
     extra: "It also works ahead: every night it spots registrations that will lapse before a shift ends.",
     roles: [
       { who: "Gemini", what: "reads the message, explains options", style: "ai" },
@@ -75,7 +75,7 @@ export const CHAPTERS: Chapter[] = [
       { label: "Open Messages", to: "/messages" },
     ],
     tourStep: 4,
-    site: { title: "Cover, before the panic.", text: "When someone cancels, Kaigo drafts cover options and a handover note.", link: { label: "See replanning", to: "/continuity" } },
+    site: { title: "Cover, before the panic.", text: "When someone cancels, KaigoAI drafts cover options and a handover note.", link: { label: "See replanning", to: "/continuity" } },
   },
 ];
 

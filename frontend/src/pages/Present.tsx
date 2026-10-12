@@ -38,7 +38,7 @@ export function PresentPage() {
   return (
     <div className={`present ${dark ? "dark paper-night" : "paper-lined"}`}>
       <header className="p-top">
-        <button type="button" className="p-brand" onClick={() => go(0)} aria-label="Kaigo, first slide"><Logo height={28} tone={dark ? "dark" : "light"} /></button>
+        <button type="button" className="p-brand" onClick={() => go(0)} aria-label="KaigoAI, first slide"><Logo height={28} tone={dark ? "dark" : "light"} /></button>
         <span className="p-label">{overview ? "All slides" : `${String(i + 1).padStart(2, "0")} / ${String(SLIDES.length).padStart(2, "0")} · ${slide.title}`}</span>
         <div className="p-actions">
           <button type="button" className="p-btn" onClick={toggleOverview} aria-pressed={overview}>▦ Overview <kbd>O</kbd></button>

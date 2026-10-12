@@ -1,6 +1,6 @@
 {
-  "name": "Kaigo",
-  "short_name": "Kaigo",
+  "name": "KaigoAI",
+  "short_name": "KaigoAI",
   "description": "Care, uninterrupted. AI operations for home-care agencies.",
   "start_url": "/app",
   "display": "standalone",

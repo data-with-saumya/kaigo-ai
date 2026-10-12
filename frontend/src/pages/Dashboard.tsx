@@ -52,7 +52,7 @@ export function DashboardPage() {
             <div className="stack-sm">
               <div className="eyebrow">Continuity alert · {relativeDay(first.received_at)}</div>
               <h2 id="alert-title">{first.caregiver_name ? `${first.caregiver_name}: change reported` : "Change reported"}</h2>
-              <p>{first.summary}{first.options ? ` Kaigo prepared ${first.options} option${first.options > 1 ? "s" : ""} and is waiting for your decision.` : ""}</p>
+              <p>{first.summary}{first.options ? ` KaigoAI prepared ${first.options} option${first.options > 1 ? "s" : ""} and is waiting for your decision.` : ""}</p>
             </div>
           </div>
           <Link className="btn primary" to={`/continuity/${first.event_id}`} viewTransition>Review options<IconArrow size={16} /></Link>
@@ -142,7 +142,7 @@ export function DashboardPage() {
       </Card>
 
       <Card title="Demo controls" className="linen" actions={<span className="small muted">Your own synthetic agency. Nobody else sees your changes.</span>}>
-        <p className="small">New here? <Link to="/learn">Learn Kaigo in six steps</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
+        <p className="small">New here? <Link to="/learn">Learn KaigoAI in six steps</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
         <div className="inline">
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("fresh")) navigate("/verify"); }}>Start from the beginning</button>
           <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("after_assignment")) navigate("/continuity"); }}>Jump to: cancellation</button>

@@ -1,4 +1,4 @@
-# Kaigo API for Cloud Run. Build context: repository root (backend + data).
+# KaigoAI API for Cloud Run. Build context: repository root (backend + data).
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8080

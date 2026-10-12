@@ -1,6 +1,6 @@
 # Responsible AI
 
-Kaigo is a care-operations product. AI assists; people decide. These are enforced in code, not just in policy.
+KaigoAI is a care-operations product. AI assists; people decide. These are enforced in code, not just in policy.
 
 | Principle | How it's enforced | Where |
 |---|---|---|

@@ -6,8 +6,8 @@ import { IconSpark } from "./Icons";
 import { ErrorNotice, Spinner } from "./ui";
 
 const KIND_LABEL: Record<Message["kind"], string> = {
-  text: "", acknowledgement: "Kaigo · automatic reply", confirmation: "Kaigo · booking confirmed",
-  handover: "Handover note · drafted by Gemini", notice: "Kaigo · update",
+  text: "", acknowledgement: "KaigoAI · automatic reply", confirmation: "KaigoAI · booking confirmed",
+  handover: "Handover note · drafted by Gemini", notice: "KaigoAI · update",
 };
 
 /** One caregiver ↔ agency thread. `viewer` decides which side is "mine". */
@@ -22,7 +22,7 @@ export function ChatThread({ messages, viewer, linkEvents, names }: {
       {messages.map((m) => {
         const mine = m.sender === viewer;
         const cls = m.sender === "kaigo" ? `kaigo${m.kind === "handover" ? " handover" : ""}` : mine ? "mine" : "theirs";
-        const who = m.sender === "kaigo" ? KIND_LABEL[m.kind] || "Kaigo"
+        const who = m.sender === "kaigo" ? KIND_LABEL[m.kind] || "KaigoAI"
           : m.sender === "coordinator" ? "Care coordinator" : names?.caregiver ?? "Caregiver";
         return (
           <div key={m.id} className={`bubble ${cls}`}>
@@ -31,7 +31,7 @@ export function ChatThread({ messages, viewer, linkEvents, names }: {
             <div className="meta">
               <span>{mine ? "You" : who}</span><span>·</span><span>{relativeDay(m.at)} {time(m.at)}</span>
               {linkEvents && m.event_id && m.sender === "caregiver" && (
-                <Link to={`/continuity/${m.event_id}`} style={{ fontWeight: 600 }}>Kaigo opened a replan →</Link>
+                <Link to={`/continuity/${m.event_id}`} style={{ fontWeight: 600 }}>KaigoAI opened a replan →</Link>
               )}
             </div>
           </div>

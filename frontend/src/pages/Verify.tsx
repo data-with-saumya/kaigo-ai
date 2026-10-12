@@ -236,7 +236,7 @@ function CredentialDetail({ credential: c, sampleFiles, reference, onChanged }: 
               </div>
             ))}
             <div className="card" style={{ padding: 14, gap: 6 }}>
-              <span className="tag rule" style={{ alignSelf: "flex-start" }}>Kaigo rules</span>
+              <span className="tag rule" style={{ alignSelf: "flex-start" }}>KaigoAI rules</span>
               <strong style={{ fontSize: 14 }}>Home-nursing rules</strong>
               <span className="small muted">Accepted credential types, expiry, evidence and confidence thresholds</span>
             </div>

@@ -58,7 +58,7 @@ export function CaregiverAppPage() {
           <ErrorNotice error={messages.error} />
           <ChatThread messages={messages.data ?? []} viewer="caregiver" names={{ caregiver: me?.name ?? "" }} />
           {messages.data?.length === 0 && (
-            <Notice tone="info">Message your coordinator here. If you can’t make a shift, just say so in your own words; Kaigo tells your coordinator straight away.</Notice>
+            <Notice tone="info">Message your coordinator here. If you can’t make a shift, just say so in your own words; KaigoAI tells your coordinator straight away.</Notice>
           )}
         </section>
       </div>

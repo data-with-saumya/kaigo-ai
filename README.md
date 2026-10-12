@@ -1,12 +1,12 @@
-# Kaigo AI
+# KaigoAI
 
 > **AI operations for care agencies: verify the right people, match them to the right care, and keep that care running when circumstances change.**
 
-Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** · Team: Saumya Singh, Shambhavi
+Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** · Team KaigoAI: Saumya Singh, Shambhavi Dubey
 
 | | |
 |---|---|
-| Live prototype (v4, this branch: new brand) | https://kaigoai-v4.web.app |
+| Live prototype (v4, this branch: the submitted version) | https://kaigoai-v4.web.app |
 | Live prototype (v3, branch `v3`) | https://kaigoai-v3.web.app |
 | Live prototype (v2, branch `v2`) | https://kaigoai-v2.web.app |
 | Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
@@ -18,9 +18,9 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 ## What's new in v4
 
-v4 gives Kaigo its brand and a simpler app. It runs on the same engine as v2 and v3 (Cloud Run `kaigo-api-v2`); only the frontend changed.
+v4 gives KaigoAI its brand and a simpler app. It has its own Cloud Run service, `kaigo-api-v4` (same engine as v2 and v3, plus the fixes from user-acceptance testing: Gemini retries when Vertex AI is busy, a safe demo reset, clearer "not found" pages). v1 to v3 are unchanged.
 
-- **Brand:** logo A ("Continuum": a ring with a gap, and the dot that closes it) in the sunrise colours. Trust is teal, Fit is sunshine and Continuity is tangerine, on notebook paper. Pen notes are in Caveat.
+- **Brand:** the KaigoAI logo: the "Continuum" mark (a ring with a gap, and the dot that closes it) and the wordmark "kaigo" in ExtraBold with "AI" in Regular, in the sunrise colours. Trust is teal, Fit is sunshine and Continuity is tangerine, on notebook paper. Pen notes are in Caveat.
 - **Website:** a single calm page. Lined paper, a few handwritten notes in the margin, one coloured button.
 - **App:** one row of tabs (Today, Trust, Fit, Continuity, Messages, Learn). The breadcrumbs, step rail and previous/next footer are gone.
 - **Learn tab:** the six-step tutorial, which you can open at any time. A sticky note shows what to do on each screen.
@@ -36,12 +36,12 @@ v4 runs as Hosting site `kaigoai-v4`.
 
 ## What's new in v2
 
-v2 moves Kaigo from a scripted demo towards a working operations tool. v1 stays live and unchanged on `main`.
+v2 moves KaigoAI from a scripted demo towards a working operations tool. v1 stays live and unchanged on `main`.
 
 | Capability | How it works | Google Cloud |
 |---|---|---|
 | **Real travel times** | The location factor uses actual driving time to the client, not straight-line distance. Results are cached; if Maps is unavailable it falls back to distance and says so | Maps Routes API, called with the service's own identity (no API key) |
-| **Proactive continuity** (rule E-02) | Every night Kaigo finds shifts a caregiver can't legally finish because their registration lapses first, flags them as at risk, and opens an early replanning event. Approving one opens the next | Cloud Scheduler → Cloud Run, OIDC-verified job |
+| **Proactive continuity** (rule E-02) | Every night KaigoAI finds shifts a caregiver can't legally finish because their registration lapses first, flags them as at risk, and opens an early replanning event. Approving one opens the next | Cloud Scheduler → Cloud Run, OIDC-verified job |
 | **Handover notes** | After a replacement is approved, Gemini briefs each incoming caregiver: hours, who they take over from and hand over to, the client's stated preferences. Grounding-checked against the approved plan; never clinical | Gemini |
 | **Tie-break rule C-02** | When plans tie on score, fewer handovers wins, and the UI says why | — |
 | **Private document storage** | Uploaded originals are stored privately, only readable by their own workspace, and deleted after 30 days | Cloud Storage (public access prevented, lifecycle rule) |
@@ -56,9 +56,9 @@ scramble. A replacement who is technically qualified may still be wrong: they've
 cover half the shift, or add another handover in the middle of the night. For a patient at home or at the end of
 life, that loss of continuity matters.
 
-**Most staffing tools answer "who can fill this shift?" Kaigo asks "how do we keep care running when the situation changes?"**
+**Most staffing tools answer "who can fill this shift?" KaigoAI asks "how do we keep care running when the situation changes?"**
 
-## What Kaigo does
+## What KaigoAI does
 
 **Trust → Fit → Continuity → Human decision → Updated state**
 
@@ -72,13 +72,13 @@ life, that loss of continuity matters.
    overlapping shift, unavailable). Eligible caregivers are ranked by a transparent seven-factor **Care Continuity
    Score**: qualification, skills, coverage, location, familiarity, stability and handovers. It is not a medical score.
 4. **Replan when something changes.** "Hi, it's Anjali, I can't do tomorrow night." Gemini reads the message, rules
-   find the affected shift and recheck every caregiver, and Kaigo builds the alternatives. For example:
+   find the affected shift and recheck every caregiver, and KaigoAI builds the alternatives. For example:
    - **A:** one new nurse for the whole night.
    - **B:** a familiar nurse until midnight, then a handover.
    - **C:** the familiar nurse alone, which leaves a gap. It is shown for transparency but can't be approved.
 
    Gemini explains the trade-offs using only the computed facts.
-5. **A person decides.** The coordinator approves, picks another option or rejects. Kaigo revalidates the plan
+5. **A person decides.** The coordinator approves, picks another option or rejects. KaigoAI revalidates the plan
    against the live schedule, then updates the care state and the audit trail.
 
 Every value in the UI shows who produced it:

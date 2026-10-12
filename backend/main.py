@@ -1,4 +1,4 @@
-"""Kaigo AI API: care-agency operations with Care Continuity Intelligence."""
+"""KaigoAI API: care-agency operations with Care Continuity Intelligence."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ log = logging.getLogger("kaigo")
 
 settings = get_settings()
 travel.configure(travel.TravelService(settings.travel_backend, settings.google_cloud_project))
-app = FastAPI(title="Kaigo AI", version="0.1.0",
+app = FastAPI(title="KaigoAI", version="0.1.0",
               description="AI operations for care agencies: verify, match, and keep care running when circumstances change.")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
                    allow_methods=["*"], allow_headers=["*"])

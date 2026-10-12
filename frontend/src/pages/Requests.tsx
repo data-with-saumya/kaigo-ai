@@ -112,7 +112,7 @@ export function RequestEditorPage() {
               </div>
             </>
           )}
-          <Notice tone="info">Describe the care needed, not a diagnosis. Kaigo plans staffing. It doesn’t make clinical judgements and drops medical details it’s given.</Notice>
+          <Notice tone="info">Describe the care needed, not a diagnosis. KaigoAI plans staffing. It doesn’t make clinical judgements and drops medical details it’s given.</Notice>
         </Card>
 
         <div className="col" style={{ flex: "1.35 1 520px", minWidth: 0 }}>

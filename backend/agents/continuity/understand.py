@@ -23,7 +23,7 @@ def read_message(gemini: GeminiService, store: Store, text: str, sender: Caregiv
     system = prompt("event_understanding", today=now.date().isoformat(), weekday=f"{now:%A}", time=f"{now:%H:%M}",
                     roster=", ".join(c.name for c in caregivers), clients=", ".join(c.name for c in clients))
     if sender:
-        system += (f"\n\nThis message was sent by {sender.name} through the Kaigo app, so 'I' and 'me' mean "
+        system += (f"\n\nThis message was sent by {sender.name} through the KaigoAI app, so 'I' and 'me' mean "
                    f"{sender.name}. Ordinary chat that changes nothing (thanks, running a few minutes late, "
                    f"questions) is event_type 'other'.")
     out = gemini.structured("event_understanding", EventExtraction, [text], system=system, store=store)

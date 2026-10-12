@@ -6,7 +6,7 @@
 #     certificates are "issued" by a synthetic council, so no real authority's documents,
 #     seals or numbering are imitated.
 #
-# Kaigo does not query any live registry in the prototype. Production would integrate
+# KaigoAI does not query any live registry in the prototype. Production would integrate
 # with the Indian Nursing Council's NRTS and state council registries (see docs/architecture.md).
 
 authorities:

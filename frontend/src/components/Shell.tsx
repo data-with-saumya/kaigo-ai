@@ -38,8 +38,8 @@ export function Shell({ children }: { children: ReactNode }) {
       <div className="app paper-lined">
         <header className="app-top">
           <div className="app-top-inner">
-            <Link to="/" className="brand" aria-label="Kaigo website" viewTransition><Logo height={26} /></Link>
-            <nav className="tabs" aria-label="Kaigo">
+            <Link to="/" className="brand" aria-label="KaigoAI website" viewTransition><Logo height={26} /></Link>
+            <nav className="tabs" aria-label="KaigoAI">
               {tabs.map((t) => (
                 <NavLink key={t.to} to={t.to} end={t.end} title={t.hint} viewTransition
                   className={({ isActive }) => `tab${isActive ? " active" : ""}`}
@@ -53,7 +53,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   )}
                 </NavLink>
               ))}
-              <NavLink to="/learn" title="Learn Kaigo in six steps" viewTransition className={({ isActive }) => `tab${isActive ? " active" : ""}`}>
+              <NavLink to="/learn" title="Learn KaigoAI in six steps" viewTransition className={({ isActive }) => `tab${isActive ? " active" : ""}`}>
                 {({ isActive }) => (
                   <><span className="learn-icon" aria-hidden="true">✎</span>Learn{isActive && <Pen stroke="underline" className="tab-under" width={2.2} />}</>
                 )}

@@ -49,7 +49,7 @@ async function request<T>(path: string, init: RequestInit = {}, json = true): Pr
   try {
     res = await fetch(`${BASE}${path}`, { ...init, headers: { ...auth, ...(init.headers ?? {}) } });
   } catch {
-    throw new ApiError(0, "network", "Can't reach the Kaigo service. Check your connection and try again.");
+    throw new ApiError(0, "network", "Can't reach the KaigoAI service. Check your connection and try again.");
   }
   if (!res.ok) {
     let detail: { code?: string; message?: string } & Record<string, unknown> = {};
