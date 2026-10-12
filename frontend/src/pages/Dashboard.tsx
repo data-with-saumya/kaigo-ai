@@ -34,9 +34,10 @@ export function DashboardPage() {
     </>
   );
   const accent = (c: string) => ({ "--accent": c } as CSSProperties);
+  const stamp = new Date().toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).replace(" ", "\n");
 
   return (
-    <Page eyebrow={`Today · ${longDay(d.now)}`} title={title}>
+    <Page eyebrow={`Today · ${longDay(d.now)}`} title={title} note={<span style={{ whiteSpace: "pre-line" }}>{stamp}</span>}>
       {health && !aiAvailable && (
         <Notice tone="review">
           <strong>Gemini is unavailable right now.</strong> Records, schedules, rule checks, matching and replanning still
@@ -54,7 +55,7 @@ export function DashboardPage() {
               <p>{first.summary}{first.options ? ` Kaigo prepared ${first.options} option${first.options > 1 ? "s" : ""} and is waiting for your decision.` : ""}</p>
             </div>
           </div>
-          <Link className="btn gold" to={`/continuity/${first.event_id}`}>Review options<IconArrow size={16} /></Link>
+          <Link className="btn primary" to={`/continuity/${first.event_id}`} viewTransition>Review options<IconArrow size={16} /></Link>
         </section>
       )}
       {!first && k.at_risk_shifts > 0 && (
@@ -69,18 +70,18 @@ export function DashboardPage() {
         <Notice tone="review">{more.length} more change{more.length > 1 ? "s" : ""} waiting. <Link to="/continuity">See all</Link></Notice>
       )}
 
-      <section aria-label="Today at a glance" className="grid-auto">
-        <div className="card kpi" style={accent("var(--plum)")}><span className="label">Active assignments</span><span className="value">{k.active_assignments}</span>
-          <span className="small muted">{Object.entries(k.assignments_by_vertical).map(([v, n]) => `${vertical(v)} ${n}`).join(" · ")}</span></div>
-        <div className="card kpi" style={accent("var(--plum)")}><span className="label">Shifts in next 24 h</span><span className="value">{k.shifts_next_24h}</span>
-          <span className="small" style={{ color: k.uncovered_upcoming ? "var(--risk)" : "var(--muted)", fontWeight: k.uncovered_upcoming ? 600 : 400 }}>
+      <section aria-label="Today at a glance" className="numbers">
+        <div className="number" style={accent("var(--plum)")}><span className="label">Active assignments</span><span className="value">{k.active_assignments}</span>
+          <span className="sub">{Object.entries(k.assignments_by_vertical).map(([v, n]) => `${vertical(v)} ${n}`).join(" · ")}</span></div>
+        <div className="number" style={accent("var(--plum)")}><span className="label">Shifts in next 24 h</span><span className="value">{k.shifts_next_24h}</span>
+          <span className="sub" style={{ color: k.uncovered_upcoming ? "var(--risk)" : undefined, fontWeight: k.uncovered_upcoming ? 700 : 400 }}>
             {k.uncovered_upcoming ? `${k.uncovered_upcoming} upcoming not fully covered` : "All upcoming shifts covered"}</span></div>
-        <div className="card kpi" style={accent("var(--trust)")}><span className="label"><span className="dot trust" />Pending verifications</span><span className="value">{k.pending_verifications}</span>
-          <span className="small muted">{k.blocked_credentials} blocked by rules</span></div>
-        <div className="card kpi" style={accent("var(--fit)")}><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
-          <span className="small muted">{k.requests_needing_confirmation} need confirmation</span></div>
-        <div className="card kpi" style={accent("var(--continuity)")}><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
-          <span className="small" style={{ color: k.at_risk_shifts ? "var(--review)" : "var(--muted)", fontWeight: k.at_risk_shifts ? 600 : 400 }}>
+        <div className="number" style={accent("var(--trust)")}><span className="label"><span className="dot trust" />Pending verifications</span><span className="value">{k.pending_verifications}</span>
+          <span className="sub">{k.blocked_credentials} blocked by rules</span></div>
+        <div className="number" style={accent("var(--fit)")}><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
+          <span className="sub">{k.requests_needing_confirmation} need confirmation</span></div>
+        <div className="number" style={accent("var(--continuity)")}><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
+          <span className="sub" style={{ color: k.at_risk_shifts ? "var(--review)" : undefined, fontWeight: k.at_risk_shifts ? 700 : 400 }}>
             {k.at_risk_shifts ? `${k.at_risk_shifts} upcoming shift${k.at_risk_shifts > 1 ? "s" : ""} at risk` : k.continuity_alerts ? "Awaiting your decision" : "Nothing waiting"}</span></div>
       </section>
 

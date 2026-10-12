@@ -4,7 +4,7 @@ import { api } from "../lib/api";
 import { useLive } from "../lib/hooks";
 import { PETAL_COLOUR, type Petal } from "../lib/story";
 import type { Dashboard, Health } from "../lib/types";
-import { Logo } from "./Brand";
+import { Logo, Note, Pen } from "./Brand";
 
 interface WorkspaceState {
   dashboard: Dashboard | null;
@@ -32,7 +32,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <WorkspaceContext.Provider value={{ dashboard: dashboard.data, dashboardError: dashboard.error, health: health.data, aiAvailable }}>
-      <div className="app paper-dots">
+      <div className="app paper-lined">
         <header className="app-top">
           <div className="app-top-inner">
             <Link to="/" className="brand" aria-label="Kaigo website" viewTransition><Logo height={26} /></Link>
@@ -41,12 +41,19 @@ export function Shell({ children }: { children: ReactNode }) {
                 <NavLink key={t.to} to={t.to} end={t.end} title={t.hint} viewTransition
                   className={({ isActive }) => `tab${isActive ? " active" : ""}`}
                   style={t.petal ? ({ "--accent": PETAL_COLOUR[t.petal] } as CSSProperties) : undefined}>
-                  {t.petal && <span className="svc-dot" />}{t.label}
-                  {t.badge ? <span className={`badge${t.alert ? " alert" : ""}`}>{t.badge}</span> : null}
+                  {({ isActive }) => (
+                    <>
+                      {t.petal && <span className="svc-dot" />}{t.label}
+                      {t.badge ? <span className={`badge${t.alert ? " alert" : ""}`}>{t.badge}</span> : null}
+                      {isActive && <Pen stroke="underline" className="tab-under" width={2.2} />}
+                    </>
+                  )}
                 </NavLink>
               ))}
               <NavLink to="/learn" title="Learn Kaigo in six steps" viewTransition className={({ isActive }) => `tab${isActive ? " active" : ""}`}>
-                <span className="learn-icon" aria-hidden="true">✎</span>Learn
+                {({ isActive }) => (
+                  <><span className="learn-icon" aria-hidden="true">✎</span>Learn{isActive && <Pen stroke="underline" className="tab-under" width={2.2} />}</>
+                )}
               </NavLink>
             </nav>
             {health.data && (
@@ -62,12 +69,14 @@ export function Shell({ children }: { children: ReactNode }) {
   );
 }
 
-export function Page({ eyebrow, title, actions, back, children }: {
-  eyebrow: ReactNode; title: ReactNode; actions?: ReactNode; back?: { to: string; label: string }; children: ReactNode;
+/** A page in the notebook: an optional pen note in the margin, a small label, a big title. */
+export function Page({ eyebrow, title, actions, back, note, children }: {
+  eyebrow: ReactNode; title: ReactNode; actions?: ReactNode; back?: { to: string; label: string }; note?: ReactNode; children: ReactNode;
 }) {
   return (
     <>
       <div className="topbar">
+        {note && <Note className="page-note" rotate={-4}>{note}</Note>}
         <div className="stack-sm" style={{ gap: 6, minWidth: 0 }}>
           {back && <Link to={back.to} className="back-link" viewTransition>← {back.label}</Link>}
           <div className="eyebrow">{eyebrow}</div>

@@ -21,7 +21,7 @@ export function MessagesPage() {
 
   const visible = (threads.data ?? []).filter((t) => showAll || t.last);
   return (
-    <Page eyebrow="Continuity · In-app chat" title="Messages"
+    <Page note="one thread each." eyebrow="Continuity · In-app chat" title="Messages"
       actions={selected && <Link className="btn secondary small" to={`/caregiver/${selected}`} target="_blank" rel="noreferrer">Open {current?.name.split(" ")[0]}’s caregiver app</Link>}>
       <div className="row">
         <Card title="Caregivers" className="grow-1" actions={<button className="link-btn small" onClick={() => setShowAll((v) => !v)}>{showAll ? "Only active" : "Show all"}</button>}>

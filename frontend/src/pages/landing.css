@@ -1,5 +1,5 @@
 /* The website: minimal notebook. Lots of air, one coloured button, a few pen notes in the margin. */
-.site { --margin-x: 120px; min-height: 100vh; position: relative; overflow-x: clip; }
+.site { --margin-x: max(120px, calc(50vw - 540px)); min-height: 100vh; position: relative; overflow-x: clip; }
 .site a { text-decoration: none; }
 .site .eyebrow { margin: 0; }
 .site-nav { max-width: 1320px; margin: 0 auto; padding: 30px 40px 0 200px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }

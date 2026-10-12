@@ -43,7 +43,7 @@ export function VerifyPage() {
   const busy = extractSample.busy || upload.busy;
 
   return (
-    <Page eyebrow="Trust · Credential verification" title={selected ? `${selected.fields.caregiver_name ?? "Unknown"} — ${selected.document_name}` : "Credential verification"}
+    <Page note="papers first." eyebrow="Trust · Credential verification" title={selected ? `${selected.fields.caregiver_name ?? "Unknown"} — ${selected.document_name}` : "Credential verification"}
       actions={selected && <VerificationChip status={selected.status} />}>
       <div className="row">
         <div className="col grow-1" style={{ flexBasis: 360 }}>

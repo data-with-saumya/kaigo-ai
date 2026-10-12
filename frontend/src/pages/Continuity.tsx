@@ -35,7 +35,7 @@ export function ContinuityPage() {
   const go = (e: ChangeEvent | undefined) => { if (e) navigate(`/continuity/${e.id}`); };
 
   return (
-    <Page eyebrow="Continuity" title="When something changes">
+    <Page note="no gap tonight." eyebrow="Continuity" title="When something changes">
       <div className="row">
         <Card title={<span className="inline"><IconMessage size={20} />Incoming message</span>} className="grow-1">
           <p className="small muted">Paste an SMS or WhatsApp message, or a note from a phone call. Gemini reads it; rules find what it affects.</p>
@@ -188,7 +188,7 @@ export function ReplanPage() {
   };
 
   return (
-    <Page back={{ to: "/continuity", label: "All changes" }} eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
+    <Page note="you decide." back={{ to: "/continuity", label: "All changes" }} eyebrow={`Continuity · Event ${event.id}`} title={affected ? `Replan shift ${affected.index} for ${affected.client_name}` : "Change received"}
       actions={<span className={`chip ${tone}`} style={{ minHeight: 36, padding: "0 14px" }}>{label}</span>}>
       <div className="row stretch">
         <Card title="What changed" className="grow-1" actions={<span className="small muted">{event.source === "sms" ? "Message" : event.source === "chat" ? "In-app chat" : event.source === "system" ? "Detected" : "Reported"} {relativeDay(event.received_at).toLowerCase()} at {time(event.received_at)}</span>}>

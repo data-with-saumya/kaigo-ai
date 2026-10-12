@@ -21,7 +21,7 @@ export function RequestsListPage() {
   const clients = useLive(api.clients, [], 600000);
   const names = Object.fromEntries((clients.data ?? []).map((c) => [c.id, c.name]));
   return (
-    <Page eyebrow="Fit · Care requests" title="Care requests" actions={<Link className="btn primary" to="/requests/new" viewTransition>New request</Link>}>
+    <Page note="in their own words." eyebrow="Fit · Care requests" title="Care requests" actions={<Link className="btn primary" to="/requests/new" viewTransition>New request</Link>}>
       <Card>
         {requests.loading && !requests.data && <Spinner label="Loading…" />}
         <div className="table-wrap">
@@ -71,7 +71,7 @@ export function RequestEditorPage() {
   const [manual, setManual] = useState<Requirements | null>(null);
 
   return (
-    <Page back={{ to: "/requests", label: "Care requests" }} eyebrow={`Fit · ${request ? `Care request ${request.id}` : "New care request"}`} title={request ? `Requirements for ${client?.name ?? "client"}` : "New care request"}>
+    <Page note="check the dates." back={{ to: "/requests", label: "Care requests" }} eyebrow={`Fit · ${request ? `Care request ${request.id}` : "New care request"}`} title={request ? `Requirements for ${client?.name ?? "client"}` : "New care request"}>
       <div className="row">
         <Card title="Describe the need" className="grow-1" labelledBy="need">
           <div className="field">
