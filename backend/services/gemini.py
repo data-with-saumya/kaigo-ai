@@ -19,6 +19,15 @@ from services.repository import Store
 log = logging.getLogger("kaigo.gemini")
 T = TypeVar("T", bound=BaseModel)
 
+# Vertex AI sometimes answers "try again later" (429 resource exhausted, or a 5xx) when shared capacity is busy.
+# Those are retried briefly with backoff; anything else fails straight away, as before.
+TRANSIENT_CODES = {429, 500, 503, 504}
+RETRY_DELAYS_S = (1.0, 2.5, 4.5)
+
+
+def _is_transient(exc: Exception) -> bool:
+    return getattr(exc, "code", None) in TRANSIENT_CODES
+
 
 class AIUnavailable(Exception):
     """Gemini isn't configured or didn't answer. The UI shows a clear unavailable state."""
@@ -69,7 +78,7 @@ class GeminiService:
             started = time.perf_counter()
             usage, ok, error = None, False, None
             try:
-                response = self._client.models.generate_content(model=self.model, contents=contents, config=config)
+                response = self._generate(task, contents, config)
                 usage = response.usage_metadata
                 result = schema.model_validate_json(response.text or "")
                 ok = True
@@ -91,3 +100,13 @@ class GeminiService:
                         ok=ok, error=error))
         raise AIOutputInvalid(f"Gemini's answer didn't match the required format twice ({last_error}). "
                               "Sent to a person instead.")
+
+    def _generate(self, task: str, contents: list, config):
+        for delay in (*RETRY_DELAYS_S, None):
+            try:
+                return self._client.models.generate_content(model=self.model, contents=contents, config=config)
+            except Exception as exc:
+                if delay is None or not _is_transient(exc):
+                    raise
+                log.warning("Gemini busy for %s (%s); retrying in %.1f s", task, getattr(exc, "code", "?"), delay)
+                time.sleep(delay)
