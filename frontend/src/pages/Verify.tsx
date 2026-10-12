@@ -17,7 +17,7 @@ export function VerifyPage() {
   const caregivers = useLive(api.caregivers);
   const samples = useLive(api.samples, [], 600000);
   const reference = useLive(api.reference, [], 600000);
-  const { aiAvailable } = useWorkspace();
+  const { aiDown } = useWorkspace();
 
   const selectedId = params.get("credential");
   const selected = credentials.data?.find((c) => c.id === selectedId) ?? null;
@@ -55,7 +55,7 @@ export function VerifyPage() {
                 {caregivers.data?.map((c) => <option key={c.id} value={c.id}>{c.name} · {c.id}</option>)}
               </select>
             </div>
-            {aiAvailable ? (
+            {!aiDown ? (
               <>
                 <div className="dropzone">
                   <span className="small" style={{ fontWeight: 600 }}>Try a synthetic sample</span>

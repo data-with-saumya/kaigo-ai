@@ -11,8 +11,10 @@ interface WorkspaceState {
   dashboardError: unknown;
   health: Health | null;
   aiAvailable: boolean;
+  /** True only once the health check has said Gemini is off. While it is still loading, pages must not claim Gemini is unavailable. */
+  aiDown: boolean;
 }
-const WorkspaceContext = createContext<WorkspaceState>({ dashboard: null, dashboardError: null, health: null, aiAvailable: false });
+const WorkspaceContext = createContext<WorkspaceState>({ dashboard: null, dashboardError: null, health: null, aiAvailable: false, aiDown: false });
 export const useWorkspace = () => useContext(WorkspaceContext);
 
 /** The coordinator app: the logo, one row of tabs, and the page. Nothing else to learn. */
@@ -21,6 +23,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const health = useLive(api.health, [], 30000);
   const k = dashboard.data?.kpis;
   const aiAvailable = health.data?.gemini === "available";
+  const aiDown = !!health.data && !aiAvailable;
 
   const tabs: { to: string; label: string; hint: string; petal?: Petal; badge?: number; alert?: boolean; end?: boolean }[] = [
     { to: "/app", label: "Today", hint: "What needs you today", end: true },
@@ -31,7 +34,7 @@ export function Shell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <WorkspaceContext.Provider value={{ dashboard: dashboard.data, dashboardError: dashboard.error, health: health.data, aiAvailable }}>
+    <WorkspaceContext.Provider value={{ dashboard: dashboard.data, dashboardError: dashboard.error, health: health.data, aiAvailable, aiDown }}>
       <div className="app paper-lined">
         <header className="app-top">
           <div className="app-top-inner">

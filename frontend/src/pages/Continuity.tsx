@@ -22,7 +22,7 @@ const STATUS_CHIP: Record<ChangeEvent["status"], [string, string]> = {
 
 export function ContinuityPage() {
   const navigate = useNavigate();
-  const { aiAvailable } = useWorkspace();
+  const { aiAvailable, aiDown } = useWorkspace();
   const events = useLive(api.events);
   const caregivers = useLive(api.caregivers, [], 600000);
   const [text, setText] = useState(EXAMPLE_SMS);
@@ -50,7 +50,7 @@ export function ContinuityPage() {
             <button className="btn quiet small" onClick={() => setText(EXAMPLE_SMS)}>Use example</button>
           </div>
           {interpret.busy && <Spinner label="Gemini is reading the message, then rules check the schedule…" />}
-          {!aiAvailable && <Notice tone="review">Gemini is unavailable. Report the change manually: replanning works the same.</Notice>}
+          {aiDown && <Notice tone="review">Gemini is unavailable. Report the change manually: replanning works the same.</Notice>}
           <ErrorNotice error={interpret.error} />
         </Card>
 
@@ -111,7 +111,7 @@ export function ContinuityPage() {
 
 export function ReplanPage() {
   const { id = "" } = useParams();
-  const { aiAvailable } = useWorkspace();
+  const { aiAvailable, aiDown } = useWorkspace();
   const live = useLive(() => api.event(id), [id], 8000);
   const caregivers = useLive(api.caregivers, [], 600000);
   const audit = useLive(() => api.audit(80), [id]);
@@ -309,7 +309,7 @@ export function ReplanPage() {
                 </div>
               ) : explain.busy ? <Spinner label="Gemini is comparing the options…" /> : (
                 <div className="stack">
-                  {!aiAvailable && <p className="muted">Gemini is unavailable, so there’s no written explanation. The factor table above has everything the recommendation is based on.</p>}
+                  {aiDown && <p className="muted">Gemini is unavailable, so there’s no written explanation. The factor table above has everything the recommendation is based on.</p>}
                   <ErrorNotice error={explain.error} />
                   {aiAvailable && <button className="btn secondary small" style={{ alignSelf: "flex-start" }} onClick={async () => { const e = await explain.run(); if (e) setEvent(e); }}>Explain trade-offs</button>}
                 </div>
@@ -365,7 +365,7 @@ export function ReplanPage() {
               ))}
             </div>
           ) : handover.busy ? <Spinner label="Gemini is drafting handover notes…" />
-            : !aiAvailable ? <p className="muted">Gemini is unavailable, so no handover notes were drafted. The new schedule is saved.</p>
+            : aiDown ? <p className="muted">Gemini is unavailable, so no handover notes were drafted. The new schedule is saved.</p>
             : <div className="stack"><ErrorNotice error={handover.error} />
                 <button className="btn secondary small" style={{ alignSelf: "flex-start" }} onClick={async () => { const e = await handover.run(); if (e) setEvent(e); }}>Draft handover notes</button></div>}
           <p className="small muted">Operational only: times, who hands over to whom, the client’s stated preferences. Checked against the approved plan; never clinical.</p>
