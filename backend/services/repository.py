@@ -47,7 +47,9 @@ class Repository(Protocol):
     def put(self, ws: str, collection: str, doc_id: str, data: dict) -> None: ...
     def put_many(self, ws: str, items: list[tuple[str, str, dict]]) -> None: ...
     def delete(self, ws: str, collection: str, doc_id: str) -> None: ...
-    def clear(self, ws: str) -> None: ...
+    def clear(self, ws: str) -> None:
+        """Delete every record in the workspace. Its meta document stays (see reset_workspace)."""
+        ...
     def get_meta(self, ws: str) -> dict | None: ...
     def workspaces(self) -> list[tuple[str, dict]]: ...
     def set_meta(self, ws: str, data: dict) -> None: ...
@@ -84,7 +86,6 @@ class MemoryRepository:
     def clear(self, ws):
         with self._lock:
             self._data.pop(ws, None)
-            self._meta.pop(ws, None)
 
     def get_meta(self, ws):
         with self._lock:
@@ -138,7 +139,6 @@ class FirestoreRepository:
                 for ref in docs[start:start + 400]:
                     batch.delete(ref)
                 batch.commit()
-        root.delete()
 
     def get_meta(self, ws):
         snap = self._db.collection(self._root).document(ws).get()

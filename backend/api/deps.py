@@ -92,10 +92,13 @@ def get_store(ws: str = Depends(workspace_id), repo: Repository = Depends(get_re
 
 
 def reset_workspace(store: Store, scenario: str) -> dict:
-    store.repo.clear(store.ws)
     anchor = clock.today()
-    store.put_many(seed.build(anchor, scenario))
     meta = {"scenario": scenario, "anchor": anchor.isoformat(), "seeded_at": clock.now().isoformat()}
+    # Mark the workspace before clearing it. A request that lands mid-reset (the Today page polls) must not
+    # see "no workspace" and start a second, conflicting seed that wipes this scenario.
+    store.repo.set_meta(store.ws, {**meta, "resetting": True})
+    store.repo.clear(store.ws)
+    store.put_many(seed.build(anchor, scenario))
     store.repo.set_meta(store.ws, meta)
     log.info("Seeded workspace %s with scenario %s", store.ws, scenario)
     return meta
