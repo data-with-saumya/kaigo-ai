@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 
+from agents.simulation.explain import EventGone
 from models.ai_schemas import HandoverOut
 from models.domain import ActorType, Assignment, Caregiver, ChangeEvent, Client, Shift
 from rules.config import skill_label
@@ -66,6 +67,8 @@ def write_handover(gemini: GeminiService, store: Store, event: ChangeEvent) -> C
         raise AIOutputInvalid(f"The handover notes included figures not in the plan ({', '.join(sorted(stray))}), "
                               "so they were withheld.")
     event.handover_notes = notes
+    if store.get(ChangeEvent, event.id) is None:  # removed while Gemini was writing (e.g. a demo reset)
+        raise EventGone("This change no longer exists, so the handover notes were discarded.")
     store.put(event)
     from agents.messaging.chat import deliver_handover
 

@@ -26,7 +26,7 @@ from agents.request.extract import (
     manual_request,
     update_requirements,
 )
-from agents.simulation.explain import explain_matches, explain_options
+from agents.simulation.explain import EventGone, explain_matches, explain_options
 from agents.verification.verify import VerificationError
 from agents.verification.verify import decide as decide_credential
 from api.deps import (
@@ -378,7 +378,10 @@ def explain_event(event_id: str, store: Store = Depends(get_store), gemini: Gemi
     found = store.get(ChangeEvent, event_id)
     if not found:
         raise fail(404, "not_found", "Event not found.")
-    return explain_options(gemini, store, found)
+    try:
+        return explain_options(gemini, store, found)
+    except EventGone as exc:
+        raise fail(404, "not_found", str(exc))
 
 
 class EventDecisionBody(BaseModel):
@@ -406,6 +409,8 @@ def handover(event_id: str, store: Store = Depends(get_store), gemini: GeminiSer
         return write_handover(gemini, store, found)
     except HandoverError as exc:
         raise fail(409, "not_ready", str(exc))
+    except EventGone as exc:
+        raise fail(404, "not_found", str(exc))
 
 
 @router.post("/continuity/scan")

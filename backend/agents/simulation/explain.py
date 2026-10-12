@@ -15,6 +15,10 @@ from services.prompts import prompt
 from services.repository import Store
 
 
+class EventGone(Exception):
+    """The change was removed while Gemini was working (e.g. the demo was reset). Nothing is written back."""
+
+
 def explain_options(gemini: GeminiService, store: Store, event: ChangeEvent) -> ChangeEvent:
     if not event.options:
         raise AIOutputInvalid("There are no options to explain.")
@@ -57,6 +61,9 @@ def explain_options(gemini: GeminiService, store: Store, event: ChangeEvent) -> 
 
     event.explanation = OptionExplanation(summary=out.summary, per_option={n.option_id: n.explanation for n in out.options},
                                           caveat=out.caveat)
+    # Gemini takes a few seconds. If the change disappeared meanwhile, saving would bring it back from the dead.
+    if store.get(ChangeEvent, event.id) is None:
+        raise EventGone("This change no longer exists, so the explanation was discarded.")
     store.put(event)
     audit.record(store, ActorType.AI, "Gemini", "event.explained",
                  f"Explained trade-offs between {len(event.options)} options (grounding check passed)", "event", event.id)

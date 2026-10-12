@@ -30,6 +30,8 @@ class RequestError(Exception):
 
 
 def extract_request(gemini: GeminiService, store: Store, client_id: str, text: str) -> CareRequest:
+    if not client_id:
+        raise RequestError("Choose a client first.")
     client = store.get(Client, client_id)
     if client is None:
         raise RequestError("Client not found.")

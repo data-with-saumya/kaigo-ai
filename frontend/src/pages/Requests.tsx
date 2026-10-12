@@ -87,7 +87,7 @@ export function RequestEditorPage() {
           {!request && (
             <>
               <div className="inline">
-                <button className="btn" disabled={!aiAvailable || extract.busy || text.trim().length < 5}
+                <button className="btn" disabled={!aiAvailable || extract.busy || !clientId || text.trim().length < 5}
                   onClick={async () => { const r = await extract.run(); if (r) navigate(`/requests/${r.id}`); }}>
                   <IconSpark size={16} />Extract requirements
                 </button>

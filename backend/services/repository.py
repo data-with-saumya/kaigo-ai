@@ -111,6 +111,8 @@ class FirestoreRepository:
         return self._db.collection(self._root).document(ws).collection(collection)
 
     def get(self, ws, collection, doc_id):
+        if not doc_id or "/" in doc_id:  # an empty or nested id is never a document; treat it as "not found"
+            return None
         snap = self._col(ws, collection).document(doc_id).get()
         return snap.to_dict() if snap.exists else None
 
