@@ -12,17 +12,17 @@ export interface TourStep {
 
 export const TOUR: TourStep[] = [
   { n: 1, petal: "trust", title: "Verify a new nurse", to: "/verify?caregiver=CG-0107", scenario: "fresh",
-    doThis: "Under “Try a synthetic sample”, choose Priya Nair’s registration. Read what Gemini extracted and what the rules flagged, then approve." },
-  { n: 2, petal: "fit", title: "Turn a request into requirements", to: "/requests/new", scenario: "fresh",
-    doThis: "Keep the first example, press Extract, confirm the start date KaigoAI asks about, then confirm." },
-  { n: 3, petal: "fit", title: "Match and assign", to: "/requests", scenario: "fresh",
-    doThis: "Open Mrs Sharma’s request. See why some caregivers were ruled out, then assign the top match." },
+    doThis: "In the Document dropdown, choose “Priya Nair: registration (valid)” and press Check document. Read the result, then approve." },
+  { n: 2, petal: "fit", title: "Describe the care needed", to: "/requests/new", scenario: "fresh",
+    doThis: "Keep the example and press Continue. Answer when KaigoAI asks when care should start, then press Find caregivers." },
+  { n: 3, petal: "fit", title: "Book the best caregiver", to: "/requests", scenario: "fresh",
+    doThis: "Open Mrs Sharma’s booking and book the caregiver marked Best fit." },
   { n: 4, petal: "continuity", title: "A caregiver messages in", to: "/caregiver/CG-0101", scenario: "after_assignment",
     doThis: "You’re now Anjali, on her phone. Tap “I can’t make my shift tomorrow night”." },
-  { n: 5, petal: "continuity", title: "Replan and approve", to: "/continuity", scenario: "after_assignment",
-    doThis: "Open the new change. Compare the options and Gemini’s explanation, then approve one." },
+  { n: 5, petal: "continuity", title: "Replan and approve", to: "/changes", scenario: "after_assignment",
+    doThis: "Open the change waiting for you. The recommended plan is already chosen; read why, then approve it." },
   { n: 6, petal: "continuity", title: "Catch problems early", to: "/app", scenario: "after_assignment",
-    doThis: "Press “Plan replacements now” to see KaigoAI spot a registration that lapses mid-assignment." },
+    doThis: "On Today, press “Plan replacements” to see KaigoAI spot a registration that lapses in the middle of a booking." },
 ];
 
 const KEY = "kaigo.tour.step";

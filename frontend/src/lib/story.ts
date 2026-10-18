@@ -42,7 +42,7 @@ export const CHAPTERS: Chapter[] = [
       { who: "Rules", what: "decide validity", style: "rule" },
       { who: "You", what: "approve", style: "human" },
     ],
-    links: [{ label: "Open Verification", to: "/verify", primary: true }],
+    links: [{ label: "Open Verify", to: "/verify", primary: true }],
     tourStep: 1,
     site: { title: "Papers, checked.", text: "Gemini reads each registration certificate. Seven plain rules decide what’s valid, and anything unclear goes to a person.", link: { label: "See verification", to: "/verify" } },
   },
@@ -55,8 +55,8 @@ export const CHAPTERS: Chapter[] = [
       { who: "You", what: "assign", style: "human" },
     ],
     links: [
-      { label: "Open Care requests", to: "/requests/new", primary: true },
-      { label: "Open Matching", to: "/requests" },
+      { label: "Open Book", to: "/requests/new", primary: true },
+      { label: "See all bookings", to: "/requests" },
     ],
     tourStep: 2,
     site: { title: "The right person, nearby.", text: "Describe the need in your own words. KaigoAI ranks who fits, with real driving times and the reasons shown.", link: { label: "See matching", to: "/requests" } },
@@ -71,7 +71,7 @@ export const CHAPTERS: Chapter[] = [
       { who: "You", what: "approve the change", style: "human" },
     ],
     links: [
-      { label: "Open Continuity", to: "/continuity", primary: true },
+      { label: "Open Replan", to: "/continuity", primary: true },
       { label: "Open Messages", to: "/messages" },
     ],
     tourStep: 4,

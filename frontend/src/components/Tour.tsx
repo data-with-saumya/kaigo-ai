@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { broadcastRefresh } from "../lib/hooks";
 import { TOUR, setTourStep, useTour } from "../lib/tour";
@@ -45,13 +45,13 @@ export function StepNote() {
   const { pathname } = useLocation();
   const [folded, setFolded] = useState(false);
   useEffect(() => setFolded(false), [step]);
-  if (!current || step === null || folded || pathname.startsWith("/tour") || pathname === "/" || pathname === "/present" || pathname === "/learn") return null;
+  if (!current || step === null || folded || pathname.startsWith("/tour") || pathname === "/" || pathname === "/present") return null;
   const onPhone = pathname.startsWith("/caregiver");
 
   return (
-    <aside className="sticky-step" aria-label={`Learn, step ${current.n}`} style={onPhone ? { top: 24, bottom: "auto" } : undefined}>
+    <aside className="sticky-step" aria-label={`Guide, step ${current.n}`} style={onPhone ? { top: 24, bottom: "auto" } : undefined}>
       <div className="spread" style={{ flexWrap: "nowrap" }}>
-        <span className="eyebrow">Learn · step {current.n} of {TOUR.length}</span>
+        <span className="eyebrow">Guide · step {current.n} of {TOUR.length}</span>
         <button type="button" className="link-btn small" onClick={() => setFolded(true)} aria-label="Hide this note">Hide</button>
       </div>
       <div className="step-dots" aria-hidden="true">{TOUR.map((t) => <span key={t.n} className={t.n <= current.n ? "done" : ""} />)}</div>
@@ -60,8 +60,7 @@ export function StepNote() {
       <div className="inline">
         {current.n < TOUR.length
           ? <button type="button" className="btn small" onClick={() => navigate(`/tour/${current.n + 1}`)}>Next step →</button>
-          : <button type="button" className="btn small" onClick={() => { setTourStep(null); navigate("/learn"); }}>Finish</button>}
-        <Link to="/learn" className="btn secondary small" viewTransition>All steps</Link>
+          : <button type="button" className="btn small" onClick={() => { setTourStep(null); navigate("/app"); }}>Finish</button>}
         <button type="button" className="link-btn small" onClick={() => setTourStep(null)}>Stop</button>
       </div>
     </aside>

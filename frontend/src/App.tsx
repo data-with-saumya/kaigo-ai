@@ -4,16 +4,15 @@ import { Shell } from "./components/Shell";
 import { StepNote, TourRoute } from "./components/Tour";
 import { scrollToTop, startSmoothScroll } from "./lib/motion";
 import { CaregiverAppPage } from "./pages/CaregiverApp";
-import { ContinuityPage, ReplanPage } from "./pages/Continuity";
+import { ChangesPage, ContinuityPage, ReplanPage } from "./pages/Continuity";
 import { DashboardPage } from "./pages/Dashboard";
 import { HowItWorksPage } from "./pages/HowItWorks";
 import { LandingPage } from "./pages/Landing";
-import { LearnPage } from "./pages/Learn";
 import { MatchPage } from "./pages/Match";
 import { MessagesPage } from "./pages/Messages";
 import { PresentPage } from "./pages/Present";
 import { RequestEditorPage, RequestsListPage } from "./pages/Requests";
-import { VerifyPage } from "./pages/Verify";
+import { DocumentsPage, VerifyPage } from "./pages/Verify";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -46,14 +45,17 @@ function CoordinatorApp() {
       <Routes>
         <Route path="/app" element={<DashboardPage />} />
         <Route path="/verify" element={<VerifyPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/requests" element={<RequestsListPage />} />
         <Route path="/requests/new" element={<RequestEditorPage />} />
         <Route path="/requests/:id" element={<RequestEditorPage />} />
         <Route path="/requests/:id/match" element={<MatchPage />} />
         <Route path="/continuity" element={<ContinuityPage />} />
         <Route path="/continuity/:id" element={<ReplanPage />} />
+        <Route path="/changes" element={<ChangesPage />} />
         <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/learn" element={<LearnPage />} />
+        {/* The six steps now live in the Guide menu; old links land on Today. */}
+        <Route path="/learn" element={<Navigate to="/app" replace />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="*" element={<Navigate to="/app" replace />} />
       </Routes>

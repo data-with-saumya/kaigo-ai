@@ -4,10 +4,13 @@ const TZ = "Asia/Kolkata";
 const timeFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: TZ });
 const dayFmt = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: TZ });
 const longDayFmt = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
+const dateFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: TZ });
 const isoDayFmt = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: TZ });
 
 export const time = (iso: string) => timeFmt.format(new Date(iso));
 export const day = (iso: string) => dayFmt.format(new Date(iso.length === 10 ? `${iso}T12:00:00+05:30` : iso));
+/** A calendar date with the year, for documents: "11 Jun 2027". */
+export const fullDate = (iso: string) => dateFmt.format(new Date(iso.length === 10 ? `${iso}T12:00:00+05:30` : iso));
 export const longDay = (iso: string) => longDayFmt.format(new Date(iso));
 export const isoDay = (d: Date) => isoDayFmt.format(d);
 export const span = (start: string, end: string) => `${time(start)}–${time(end)}`;

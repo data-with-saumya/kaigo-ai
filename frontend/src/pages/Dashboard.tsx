@@ -1,160 +1,93 @@
-import type { CSSProperties } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuditList } from "../components/AuditList";
-import { Pen } from "../components/Brand";
-import { IconArrow, IconLoop } from "../components/Icons";
+import { More } from "../components/Flow";
 import { Page, useWorkspace } from "../components/Shell";
-import { Card, ErrorNotice, Notice, Spinner, VerificationChip } from "../components/ui";
+import { ErrorNotice, Notice, Spinner } from "../components/ui";
 import { api } from "../lib/api";
-import { longDay, relativeDay, span, vertical } from "../lib/format";
-import { useAction } from "../lib/hooks";
+import { longDay, relativeDay, span } from "../lib/format";
+import { broadcastRefresh, useAction } from "../lib/hooks";
 
+type Need = { key: string; tone: "continuity" | "trust" | "fit" | "review"; text: string; action: string; to?: string; run?: () => void };
+
+/** Today: what needs you, in order, one button each. Then the shifts coming up. */
 export function DashboardPage() {
-  const { dashboard: d, dashboardError, aiAvailable, health } = useWorkspace();
+  const { dashboard: d, dashboardError, aiDown } = useWorkspace();
   const navigate = useNavigate();
-  const reset = useAction(api.reset);
   const checks = useAction(api.runChecks);
+  const [showAll, setShowAll] = useState(false);
 
   if (!d) return (
-    <Page eyebrow="Operations" title="Today’s care picture">
+    <Page title="Today">
       {dashboardError ? <ErrorNotice error={dashboardError} /> : <Spinner label="Setting up your demo agency…" />}
     </Page>
   );
   const k = d.kpis;
-  const [first, ...more] = d.alerts;
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
-  const waiting = k.continuity_alerts;
-  const title = (
-    <>
-      {greeting}{" "}
-      {waiting
-        ? <span className="pen-wrap" style={{ color: "var(--continuity-ink)" }}>{waiting} change{waiting > 1 ? "s need" : " needs"} you.<Pen stroke="underline" className="under" width={2.2} delay={300} /></span>
-        : k.uncovered_upcoming ? `${k.uncovered_upcoming} shift${k.uncovered_upcoming > 1 ? "s" : ""} not fully covered.` : "Every shift is covered."}
-    </>
-  );
-  const accent = (c: string) => ({ "--accent": c } as CSSProperties);
-  const stamp = new Date().toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).replace(" ", "\n");
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  const needs: Need[] = [
+    ...d.alerts.map((a) => ({ key: a.event_id, tone: "continuity" as const,
+      text: !a.summary ? `${a.caregiver_name ?? "A caregiver"} reported a change.` : a.caregiver_name && !a.summary.includes(a.caregiver_name) ? `${a.caregiver_name}: ${a.summary}` : a.summary,
+      action: "Replan", to: `/continuity/${a.event_id}` })),
+    ...(d.alerts.length === 0 && k.at_risk_shifts > 0 ? [{ key: "risk", tone: "review" as const,
+      text: `${k.at_risk_shifts} upcoming shift${k.at_risk_shifts > 1 ? "s are" : " is"} at risk: a registration lapses before the shift ends.`,
+      action: "Plan replacements", run: async () => { const r = await checks.run(); broadcastRefresh(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`); } }] : []),
+    ...d.pending_verifications.map((p) => ({ key: `v-${p.caregiver_id}`, tone: "trust" as const, text: `${p.name}: ${p.reason.replace(/\.$/, "")}.`,
+      action: p.credential_id ? "Review" : "Check", to: p.credential_id ? `/verify?credential=${p.credential_id}` : `/verify?caregiver=${p.caregiver_id}` })),
+    ...d.open_requests.map((r) => ({ key: r.id, tone: "fit" as const,
+      text: `${r.client_name}: ${r.needs_review.length ? "booking needs your confirmation" : "booking not finished"}.`, action: "Book", to: `/requests/${r.id}` })),
+  ];
+  const shifts = showAll ? d.upcoming_shifts : d.upcoming_shifts.slice(0, 5);
 
   return (
-    <Page eyebrow={`Today · ${longDay(d.now)}`} title={title} note={<span style={{ whiteSpace: "pre-line" }}>{stamp}</span>}>
-      {health && !aiAvailable && (
-        <Notice tone="review">
-          <strong>Gemini is unavailable right now.</strong> Records, schedules, rule checks, matching and replanning still
-          work. Reading documents and messages, and writing explanations, are paused. Nothing will be guessed.
-        </Notice>
-      )}
+    <Page title={`${greeting}.`} lead={`${longDay(d.now)} · ${k.active_assignments} active bookings · ${k.shifts_next_24h} shifts in the next 24 hours${k.uncovered_upcoming ? ` · ${k.uncovered_upcoming} not fully covered` : ", all covered"}.`}>
+      {aiDown && <Notice tone="review">Gemini is paused. Records, rules, matching and replanning still work; reading documents and messages waits until it’s back.</Notice>}
 
-      {first && (
-        <section className="alert-banner" aria-labelledby="alert-title">
-          <div className="inline" style={{ flex: "1 1 420px", alignItems: "flex-start", gap: 16, flexWrap: "nowrap" }}>
-            <span className="alert-icon"><IconLoop size={22} /></span>
-            <div className="stack-sm">
-              <div className="eyebrow">Continuity alert · {relativeDay(first.received_at)}</div>
-              <h2 id="alert-title">{first.caregiver_name ? `${first.caregiver_name}: change reported` : "Change reported"}</h2>
-              <p>{first.summary}{first.options ? ` KaigoAI prepared ${first.options} option${first.options > 1 ? "s" : ""} and is waiting for your decision.` : ""}</p>
-            </div>
-          </div>
-          <Link className="btn primary" to={`/continuity/${first.event_id}`} viewTransition>Review options<IconArrow size={16} /></Link>
-        </section>
-      )}
-      {!first && k.at_risk_shifts > 0 && (
-        <Notice tone="review">
-          <strong>{k.at_risk_shifts} upcoming shift{k.at_risk_shifts > 1 ? "s are" : " is"} at risk</strong>: a caregiver’s registration lapses before the shift ends (rule E-02).{" "}
-          <button className="link-btn" disabled={checks.busy} onClick={async () => {
-            const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
-          }}>Plan replacements now</button>
-        </Notice>
-      )}
-      {more.length > 0 && (
-        <Notice tone="review">{more.length} more change{more.length > 1 ? "s" : ""} waiting. <Link to="/continuity">See all</Link></Notice>
-      )}
-
-      <section aria-label="Today at a glance" className="numbers">
-        <div className="number" style={accent("var(--plum)")}><span className="label">Active assignments</span><span className="value">{k.active_assignments}</span>
-          <span className="sub">{Object.entries(k.assignments_by_vertical).map(([v, n]) => `${vertical(v)} ${n}`).join(" · ")}</span></div>
-        <div className="number" style={accent("var(--plum)")}><span className="label">Shifts in next 24 h</span><span className="value">{k.shifts_next_24h}</span>
-          <span className="sub" style={{ color: k.uncovered_upcoming ? "var(--risk)" : undefined, fontWeight: k.uncovered_upcoming ? 700 : 400 }}>
-            {k.uncovered_upcoming ? `${k.uncovered_upcoming} upcoming not fully covered` : "All upcoming shifts covered"}</span></div>
-        <div className="number" style={accent("var(--trust)")}><span className="label"><span className="dot trust" />Pending verifications</span><span className="value">{k.pending_verifications}</span>
-          <span className="sub">{k.blocked_credentials} blocked by rules</span></div>
-        <div className="number" style={accent("var(--fit)")}><span className="label"><span className="dot fit" />Open care requests</span><span className="value">{k.open_requests}</span>
-          <span className="sub">{k.requests_needing_confirmation} need confirmation</span></div>
-        <div className="number" style={accent("var(--continuity)")}><span className="label"><span className="dot continuity" />Continuity alerts</span><span className="value">{k.continuity_alerts}</span>
-          <span className="sub" style={{ color: k.at_risk_shifts ? "var(--review)" : undefined, fontWeight: k.at_risk_shifts ? 700 : 400 }}>
-            {k.at_risk_shifts ? `${k.at_risk_shifts} upcoming shift${k.at_risk_shifts > 1 ? "s" : ""} at risk` : k.continuity_alerts ? "Awaiting your decision" : "Nothing waiting"}</span></div>
+      <section className="needs" aria-labelledby="needs-title">
+        <h2 id="needs-title" className="section-title">{needs.length ? `Needs you (${needs.length})` : "Nothing needs you right now."}</h2>
+        {needs.length > 0 && (
+          <ol className="need-list">
+            {needs.map((n) => (
+              <li key={n.key} className={`need ${n.tone}`}>
+                <span className="need-dot" />
+                <span className="need-text">{n.text}</span>
+                {n.to ? <Link className="btn small" to={n.to} viewTransition>{n.action}</Link>
+                  : <button className="btn small" disabled={checks.busy} onClick={n.run}>{n.action}</button>}
+              </li>
+            ))}
+          </ol>
+        )}
+        {checks.busy && <Spinner label="Checking upcoming shifts…" />}
+        <ErrorNotice error={checks.error} />
+        {!needs.length && <p className="muted">Start a new booking from <strong>Book</strong>, or try a scenario from <strong>Guide</strong>.</p>}
       </section>
 
-      <div className="row">
-        <Card title="Upcoming shifts" className="grow-2" labelledBy="shifts-title">
-          <div className="table-wrap">
-            <table style={{ minWidth: 620 }}>
-              <thead><tr><th>When</th><th>Client</th><th>Care</th><th>Caregiver</th><th>Status</th></tr></thead>
-              <tbody>
-                {d.upcoming_shifts.map((s) => (
-                  <tr key={s.id} className={s.status === "covered" && !s.risk ? "" : "flag"}>
-                    <td style={{ whiteSpace: "nowrap" }}><span className="num" style={{ fontSize: 17 }}>{relativeDay(s.start)} {span(s.start, s.end)}</span></td>
-                    <td>{s.client_name}</td>
-                    <td className="muted">{vertical(s.vertical)}</td>
-                    <td>{s.segments.map((seg, i) => (
-                      <span key={i} style={{ display: "block" }}>
-                        {seg.caregiver_name ?? <span style={{ color: "var(--risk)", fontWeight: 600 }}>Uncovered</span>}
-                        {s.segments.length > 1 && <span className="muted small"> {span(seg.start, seg.end)}</span>}
-                      </span>))}
-                      {s.risk && <span className="small" style={{ display: "block", color: "var(--review)" }}>{s.risk}</span>}</td>
-                    <td>{s.risk
-                      ? <span className="chip review" title={s.risk}>At risk</span>
-                      : s.status === "covered"
-                      ? <span className="chip ok">Covered</span>
-                      : <Link to="/continuity" className="chip risk" style={{ textDecoration: "none" }}>{s.status === "partial" ? "Partly covered" : "Uncovered"}</Link>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+      <section aria-labelledby="shifts-title" className="stack">
+        <h2 id="shifts-title" className="section-title">Coming up</h2>
+        <ul className="shift-list">
+          {shifts.map((s) => {
+            const who = s.segments.map((seg) => seg.caregiver_name ?? "Uncovered").join(" → ");
+            const state = s.risk ? "At risk" : s.status === "covered" ? "Covered" : s.status === "partial" ? "Partly covered" : "Uncovered";
+            return (
+              <li key={s.id} className={`shift ${s.risk ? "risk" : s.status === "covered" ? "" : "gap"}`}>
+                <span className="shift-when">{relativeDay(s.start)} <span className="muted">{span(s.start, s.end)}</span></span>
+                <span className="shift-who">{s.client_name} <span className="muted">· {who}</span></span>
+                <span className="shift-state" title={s.risk ?? undefined}>{state}</span>
+              </li>
+            );
+          })}
+        </ul>
+        {d.upcoming_shifts.length > 5 && (
+          <button className="link-btn small" style={{ alignSelf: "flex-start" }} onClick={() => setShowAll((v) => !v)}>
+            {showAll ? "Show fewer" : `Show all ${d.upcoming_shifts.length}`}
+          </button>
+        )}
+      </section>
 
-        <div className="col grow-1">
-          <Card title="Pending verifications" actions={<Link to="/verify" className="small">Open</Link>}>
-            {d.pending_verifications.length === 0 && <p className="muted">Everyone is verified.</p>}
-            {d.pending_verifications.map((p) => (
-              <Link key={p.caregiver_id} to={p.credential_id ? `/verify?credential=${p.credential_id}` : `/verify?caregiver=${p.caregiver_id}`}
-                className="spread" style={{ textDecoration: "none", color: "inherit", minHeight: 44, flexWrap: "nowrap" }}>
-                <span className="stack-sm" style={{ gap: 0, minWidth: 0 }}><strong>{p.name}</strong><span className="small muted">{p.reason}</span></span>
-                <VerificationChip status={p.status} />
-              </Link>
-            ))}
-          </Card>
-          <Card title="Open care requests" actions={<Link to="/requests/new" className="small">New request</Link>}>
-            {d.open_requests.length === 0 && <p className="muted">No open requests.</p>}
-            {d.open_requests.map((r) => (
-              <Link key={r.id} to={`/requests/${r.id}`} className="stack-sm" style={{ textDecoration: "none", color: "inherit", gap: 0, minHeight: 44 }}>
-                <strong>{r.client_name}</strong>
-                <span className="small muted">{r.summary ?? r.id}{r.needs_review.length ? " · needs confirmation" : ""}</span>
-              </Link>
-            ))}
-          </Card>
-        </div>
-      </div>
-
-      <Card title="Audit trail" actions={<span className="small muted">Every AI suggestion, rule result and human decision</span>}>
+      <More label="Activity log: every AI suggestion, rule result and decision">
         <AuditList entries={d.recent_audit} />
-      </Card>
-
-      <Card title="Demo controls" className="linen" actions={<span className="small muted">Your own synthetic agency. Nobody else sees your changes.</span>}>
-        <p className="small">New here? <Link to="/learn">Learn KaigoAI in six steps</Link>. Or reset the story yourself, open Anjali’s caregiver app, and message the agency as she would.</p>
-        <div className="inline">
-          <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("fresh")) navigate("/verify"); }}>Start from the beginning</button>
-          <button className="btn secondary small" disabled={reset.busy} onClick={async () => { if (await reset.run("after_assignment")) navigate("/continuity"); }}>Jump to: cancellation</button>
-          <Link className="btn secondary small" to="/caregiver/CG-0101">Open Anjali’s caregiver app</Link>
-          <button className="btn primary small" disabled={checks.busy} onClick={async () => {
-            const r = await checks.run(); if (r?.opened.length) navigate(`/continuity/${r.opened[0].id}`);
-          }}>Run proactive checks now</button>
-          {(reset.busy || checks.busy) && <Spinner label="Working…" />}
-        </div>
-        <p className="small muted">Proactive checks also run every night on Google Cloud Scheduler. They catch registrations that will lapse before an upcoming shift ends.</p>
-        <ErrorNotice error={reset.error ?? checks.error} />
-      </Card>
+      </More>
     </Page>
   );
 }

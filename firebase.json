@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "kaigoai-v4",
+    "site": "kaigoai-v5",
     "public": "frontend/dist",
     "ignore": [
       "firebase.json",

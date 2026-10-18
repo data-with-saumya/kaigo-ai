@@ -6,7 +6,8 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 | | |
 |---|---|
-| Live prototype (v4, this branch: the submitted version) | https://kaigoai-v4.web.app |
+| Live prototype (v5, branch `v5`: simpler step-by-step app) | https://kaigoai-v5.web.app |
+| Live prototype (v4, branch `v4`: the submitted version) | https://kaigoai-v4.web.app |
 | Live prototype (v3, branch `v3`) | https://kaigoai-v3.web.app |
 | Live prototype (v2, branch `v2`) | https://kaigoai-v2.web.app |
 | Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
@@ -15,6 +16,17 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 | Pitch deck (PDF) | _[link]_ |
 
 ---
+
+## What's new in v5
+
+v5 keeps the KaigoAI brand and the whole workflow, and makes the app calmer and easier to follow:
+
+- **One row of tabs, each with a dropdown:** Today, Verify, Book, Replan, Messages and Guide. The six-step guide and the demo controls live in the Guide dropdown instead of a separate page.
+- **Every job is a straight line of numbered steps** with one main button: Verify (choose a document, check the result, approve), Book (describe the care, check the details, choose a caregiver, booked) and Replan (report the change, choose a plan, approve).
+- **Less on screen:** examples, documents and caregivers are picked from dropdowns; rule details, scores, sources and the audit trail sit behind "Show details".
+- **Today** is one list of what needs you, one button each, then the shifts coming up.
+
+v5 runs as Hosting site `kaigoai-v5` on the same backend as v4 (Cloud Run `kaigo-api-v4`), with its own browser API key restricted to the v5 domains.
 
 ## What's new in v4
 

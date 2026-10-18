@@ -25,7 +25,7 @@ const PRINCIPLES = [
 export function HowItWorksPage() {
   const metrics = useLive(api.metrics, [], 15000);
   return (
-    <Page note="the whole loop." back={{ to: "/learn", label: "Learn" }} eyebrow="About" title="How KaigoAI works">
+    <Page back={{ to: "/app", label: "Today" }} title="How KaigoAI works">
       <Card title="Trust → Fit → Continuity → Human decision → Updated state">
         <ol className="grid-auto" style={{ margin: 0, padding: 0, listStyle: "none" }}>
           {LOOP.map((step, i) => (

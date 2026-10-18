@@ -104,7 +104,7 @@ export function LandingPage() {
         <span>KaigoAI · built on Google Cloud with Gemini · Google Cloud AI Builder Cup 2026 · synthetic demo data only</span>
         <span className="foot-links">
           <Link to="/present">Present the story</Link>
-          <Link to="/learn" viewTransition>Learn in six steps</Link>
+          <Link to="/tour/1?setup=1" viewTransition>Take the six-step guide</Link>
           <a href="https://github.com/data-with-saumya/kaigo-ai" target="_blank" rel="noreferrer">Source on GitHub</a>
         </span>
       </footer>
