@@ -111,7 +111,7 @@ export function ChangesPage() {
   return (
     <Page title="Changes" actions={<Link className="btn primary small" to="/continuity">Report a change</Link>}>
       {events.loading && !events.data && <Spinner label="Loading…" />}
-      {events.data?.length === 0 && <p className="muted">No changes yet. Report one, or run the proactive checks from the Replan menu.</p>}
+      {events.data?.length === 0 && <p className="muted">No changes yet. Report one, or press “Plan replacements” on Today to run the proactive checks.</p>}
       <ul className="row-list">
         {events.data?.map((e) => {
           const [tone, label] = STATUS[e.status];

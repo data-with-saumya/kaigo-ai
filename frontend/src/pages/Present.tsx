@@ -97,7 +97,7 @@ export function PresentPage() {
               <h1 className="p-big">See it on tonight’s schedule.</h1>
               <div className="p-ctas">
                 <Link to="/tour/1?setup=1" className="p-cta solid">Take the guided tour</Link>
-                <Link to="/app" className="p-cta">Open the app</Link>
+                <Link to="/for/coordinator" className="p-cta">Open the app</Link>
                 <button type="button" className="p-cta" onClick={() => go(0)}>↺ Back to the beginning</button>
               </div>
             </section>

@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
+import { BackButton } from "../components/Shell";
 import { Logo, Note, Pen, Reveal } from "../components/Brand";
 import { CHAPTERS, HERO, PETAL_COLOUR, PETAL_INK, PRINCIPLES, PROOF, PROOF_NOTE, STACK } from "../lib/story";
 import "./landing.css";
 
 /** The website: one calm page on notebook paper, with a few notes in the margin like a coordinator reading it. */
 export function LandingPage() {
+  const hasHistory = typeof window !== "undefined" && (window.history.state?.idx ?? 0) > 0;
   return (
     <div className="site paper-lined">
       <nav className="site-nav" aria-label="KaigoAI">
@@ -12,7 +14,8 @@ export function LandingPage() {
         <div className="site-links">
           <a href="#how">How it works</a>
           <a href="#proof">Proof</a>
-          <Link to="/app" className="btn quiet small" viewTransition>Open the app</Link>
+          {hasHistory && <BackButton className="text-link" fallback="/" />}
+          <Link to="/for/coordinator" className="btn quiet small" viewTransition>Open the app</Link>
         </div>
       </nav>
 
@@ -22,7 +25,7 @@ export function LandingPage() {
           <h1>A nurse cancels<br />at 21:32.<br /><span className="highlight sweep">{HERO.emphasis}</span></h1>
           <p className="lead">{HERO.body}</p>
           <div className="ctas">
-            <Link to="/tour/1?setup=1" className="btn primary">Take the 2-minute tour</Link>
+            <Link to="/for/coordinator" className="btn primary" viewTransition>See what it does for you</Link>
             <Link to="/app" className="text-link" viewTransition>Open the live demo</Link>
           </div>
         </div>
@@ -94,7 +97,7 @@ export function LandingPage() {
       <Reveal as="section" className="final">
         <h2>See it on tonight’s schedule.</h2>
         <div className="ctas">
-          <Link to="/tour/1?setup=1" className="btn primary">Take the 2-minute tour</Link>
+          <Link to="/for/coordinator" className="btn primary" viewTransition>See what it does for you</Link>
           <Link to="/app" className="text-link" viewTransition>Open the live demo</Link>
         </div>
         <Note className="sign">— team KaigoAI</Note>
@@ -104,7 +107,10 @@ export function LandingPage() {
         <span>KaigoAI · built on Google Cloud with Gemini · Google Cloud AI Builder Cup 2026 · synthetic demo data only</span>
         <span className="foot-links">
           <Link to="/present">Present the story</Link>
-          <Link to="/tour/1?setup=1" viewTransition>Take the six-step guide</Link>
+          <Link to="/for/coordinator" viewTransition>For coordinators</Link>
+          <Link to="/for/nurse" viewTransition>For nurses</Link>
+          <Link to="/for/owner" viewTransition>For agency owners</Link>
+          <Link to="/for/family" viewTransition>For patients and families</Link>
           <a href="https://github.com/data-with-saumya/kaigo-ai" target="_blank" rel="noreferrer">Source on GitHub</a>
         </span>
       </footer>

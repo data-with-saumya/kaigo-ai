@@ -6,6 +6,7 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 | | |
 |---|---|
+| Live prototype (v6, branch `v6`: one tab per audience, with guides) | https://kaigoai-v6.web.app |
 | Live prototype (v5, branch `v5`: simpler step-by-step app) | https://kaigoai-v5.web.app |
 | Live prototype (v4, branch `v4`: the submitted version) | https://kaigoai-v4.web.app |
 | Live prototype (v3, branch `v3`) | https://kaigoai-v3.web.app |
@@ -16,6 +17,17 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 | Pitch deck (PDF) | _[link]_ |
 
 ---
+
+## What's new in v6
+
+v6 makes it obvious who KaigoAI is for and what it does for each of them:
+
+- **One tab per audience:** Coordinator, Nurse, Agency owner, and Patient & family.
+- **Each tab is a straight, numbered flow of functions.** Every function says what it does for that person and how they use it, with a button.
+- **Each button opens a guide page:** what it does, who does what (you, the rules, or Gemini), a step-by-step tour, and **Try it now**, which sets up the demo and opens the real screen with a sticky note repeating the steps.
+- **A Back button on every page** returns to the previous page (the phone app has one too).
+
+The working screens are the same as v5. v6 runs as Hosting site `kaigoai-v6` on the same backend (Cloud Run `kaigo-api-v4`).
 
 ## What's new in v5
 

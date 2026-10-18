@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ChatThread, Composer } from "../components/ChatThread";
 import { Logo } from "../components/Brand";
+import { BackButton } from "../components/Shell";
 import { ErrorNotice, Notice, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { relativeDay, span } from "../lib/format";
@@ -26,6 +27,7 @@ export function CaregiverAppPage() {
   return (
     <div className="phone">
       <header className="phone-head">
+        <BackButton className="phone-back" fallback="/for/nurse" />
         <div className="spread" style={{ flexWrap: "nowrap" }}>
           <Logo height={22} tone="dark" />
           <span className="tag rule">Caregiver app · demo view</span>
@@ -34,7 +36,7 @@ export function CaregiverAppPage() {
           <div className="eyebrow">Signed in as</div>
           <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{me?.name ?? "…"}</h1>
         </div>
-        <p className="small muted">In the real app caregivers sign in on their phone with a one-time code. <Link to="/messages">Back to coordinator view</Link></p>
+        <p className="small muted">In the real app caregivers sign in on their phone with a one-time code.</p>
       </header>
 
       <div className="phone-body">

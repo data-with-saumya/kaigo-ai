@@ -60,7 +60,7 @@ export function DashboardPage() {
         )}
         {checks.busy && <Spinner label="Checking upcoming shifts…" />}
         <ErrorNotice error={checks.error} />
-        {!needs.length && <p className="muted">Start a new booking from <strong>Book</strong>, or try a scenario from <strong>Guide</strong>.</p>}
+        {!needs.length && <p className="muted">Open the <Link to="/for/coordinator">Coordinator</Link> tab to see everything you can do, with a guide for each.</p>}
       </section>
 
       <section aria-labelledby="shifts-title" className="stack">
