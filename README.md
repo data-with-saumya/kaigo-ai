@@ -6,9 +6,9 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 
 | | |
 |---|---|
-| Live prototype (v6, branch `v6`: one tab per audience, with guides) | https://kaigoai-v6.web.app |
+| **Live prototype (v6, the submitted version):** one tab per audience, with guides | https://kaigoai-v6.web.app |
 | Live prototype (v5, branch `v5`: simpler step-by-step app) | https://kaigoai-v5.web.app |
-| Live prototype (v4, branch `v4`: the submitted version) | https://kaigoai-v4.web.app |
+| Live prototype (v4, branch `v4`) | https://kaigoai-v4.web.app |
 | Live prototype (v3, branch `v3`) | https://kaigoai-v3.web.app |
 | Live prototype (v2, branch `v2`) | https://kaigoai-v2.web.app |
 | Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
