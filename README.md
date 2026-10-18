@@ -13,7 +13,7 @@ Google Cloud AI Builder Cup 2026 · Theme: **Sustainability & Social Impact** ·
 | Live prototype (v2, branch `v2`) | https://kaigoai-v2.web.app |
 | Live prototype (v1, `main` / tag `v1.0`) | https://kaigoai-v1-510607.web.app |
 | Source code | https://github.com/data-with-saumya/kaigo-ai |
-| Demo video (2:54) | _[YouTube link, added after upload]_ |
+| Demo video (2:55) | https://youtu.be/Tr6l-tZZjfs |
 | Pitch deck (PDF) | [submission/KaigoAI-Pitch-Deck.pdf](submission/KaigoAI-Pitch-Deck.pdf) |
 
 ---
